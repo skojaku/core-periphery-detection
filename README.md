@@ -80,12 +80,15 @@ mean nodes A, C belong to group 1, A is a core, and C is a periphery for the gro
 
 ### List of algorithms
 
+Some algorithms detect continuous spectrum of a core and a periphery. 
+
+
 Please see the source code for the parameters specific to the algorithms. 
 
 | Algorithm | Reference |
 |-----------|-----------|
-| [cpnet.BE](cpnet/BE.py) | S. P. Borgatti and M. G. Everett. Models of core/periphery structures. Soc.~Netw., 21, 375–395, 2000 |
-| [cpnet.MINRES](cpnet/MINRES.py)  | S. Z. W.~ Lip. A fast algorithm for the discrete core/periphery bipartitioning problem. arXiv, pages 1102.5511, 2011 |
+| [cpnet.BE](cpnet/BE.py) | S. P. Borgatti and M. G. Everett. Models of core/periphery structures. Soc. Netw., 21, 375–395, 2000 |
+| [cpnet.MINRES](cpnet/MINRES.py)  | S. Z. W. Lip. A fast algorithm for the discrete core/periphery bipartitioning problem. arXiv, pages 1102.5511, 2011 |
 | [cpnet.LowRankCore](cpnet/Cucuringu.py)  | M. Cucuringu, P. Rombach, S. H. Lee, and M. A. Porter Detection of core-periphery structure in networks using spectral methods and geodesic paths. Euro. J. Appl. Math., 846–887, 2016. |
 | [cpnet.LapCore](cpnet/Cucuringu.py)  | M. Cucuringu, P. Rombach, S. H. Lee, and M. A. Porter Detection of core-periphery structure in networks using spectral methods and geodesic paths. Euro. J. Appl. Math., 846–887, 2016. |
 | [cpnet.LapSgnCore](cpnet/Cucuringu.py) | M. Cucuringu, P. Rombach, S. H. Lee, and M. A. Porter Detection of core-periphery structure in networks using spectral methods and geodesic paths. Euro. J. Appl. Math., 846–887, 2016. |
@@ -95,6 +98,15 @@ Please see the source code for the parameters specific to the algorithms.
 | [cpnet.KM_ER](cpnet/KM_ER.py) | S. Kojaku and N. Masuda. Finding multiple core-periphery pairs in networks. Phys. Rev. 96, 052313, 2017 |
 | [cpnet.KM_config](cpnet/KM_config.py) | S. Kojaku and N. Masuda. Core-periphery structure requires something else in networks. New J. Phys. 2018 |
 | [cpnet.Divisive](cpnet/Divisive.py) | S. Kojaku and N. Masuda. Core-periphery structure requires something else in networks. New J. Phys. 2018 |
+
+### Detectable core-periphery structure 
+
+- Single pair of a core and a periphery:
+  - cpnet.BE, cpnet.MINRES, cpnet.LapCore, cpnet.LapSgnCore, cpnet.Surprise
+- Multiple pairs of a core and a periphery 
+  - cpnet.KM_ER, cpnet.KM_config, cpnet.Divisive
+- Continuous spectrum between a core and a periphery:  
+  - cpnet.Rombach, cpnet.Rossa 
 
 ## Statistical test
 
