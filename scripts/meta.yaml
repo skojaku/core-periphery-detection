@@ -1,0 +1,53 @@
+{% set name = "cpnet" %}
+{% set version = "0.0.4" %}
+
+package:
+  name: "{{ name|lower }}"
+  version: "{{ version }}"
+
+source:
+  url: "https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz"
+  sha256: b775be2e40845dd53c7d1910e7522d3703ed5f3de7773aee250c7e2dba970bab
+
+build:
+  number: 0
+  script: "{{ PYTHON }} -m pip install . -vv"
+  noarch: python
+
+requirements:
+  host:
+    - joblib >=0.16.0
+    - networkx >=2.0
+    - numba
+    - numpy >=1.16.0
+    - pip
+    - python >=3.6
+    - scipy >=1.5.2
+    - simanneal >=0.4.2
+    - tqdm
+  run:
+    - joblib >=0.16.0
+    - networkx >=2.0
+    - numba
+    - numpy >=1.16.0
+    - python >=3.6
+    - scipy >=1.5.2
+    - simanneal >=0.4.2
+    - tqdm
+
+test:
+  imports:
+    - cpnet 
+
+about:
+  home: "https://github.com/skojaku/core-periphery-detection"
+  license: MIT
+  license_family: MIT
+  license_file:
+  summary: "Algorithm for finding multiple core-periphery pairs in networks"
+  doc_url:
+  dev_url:
+
+extra:
+  recipe-maintainers:
+    - skojaku 
