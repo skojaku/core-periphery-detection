@@ -5,6 +5,144 @@ from . import utils
 import numba
 
 
+class Rombach(CPAlgorithm):
+    """Rombach's algorithm for finding continuous core-periphery structure.
+
+    Parameters
+    ----------
+    num_runs : int
+        Number of runs of the algorithm  (optional, default: 1).
+
+    alpha : float
+        Sharpness of core-periphery boundary (optional, default: 0.5).
+
+        alpha=0 or alpha=1 gives the fuzziest or sharpest boundary, respectively.
+
+    beta : float
+        Fraction of peripheral nodes (optional, default: 0.8)
+
+    algorithm : str
+        Optimisation algorithm (optional, default: 'ls')
+            In the original paper [1], the authors adopted a simulated annealing to optimise the objective function, which is computationally demanding.
+            To mitigate the computational cost, a label switching algorithm is implemented in cpnet.
+            One can choose either algorithm by specifying algorithm='ls' (i.e., label switching) or algorithm='sa' (i.e., simulated annealing).
+
+    .. note::
+
+       The parameters of the simulated annealing such as the initial temperature and cooling schedule are different from those used in the original paper [1].
+
+
+    Examples
+    --------
+    Create this object.
+
+    >>> import cpnet
+    >>> rb = cpnet.Rombach()
+
+    **Core-periphery detection**
+
+    Detect core-periphery structure in network G (i.e., NetworkX object):
+
+    >>> rb.detect(G)
+
+    Retrieve the ids of the core-periphery pair to which each node belongs:
+
+    >>> pair_id = rb.get_pair_id()
+
+    Retrieve the coreness:
+
+    >>> coreness = rb.get_coreness()
+
+    .. note::
+
+       This algorithm can accept unweighted and weighted networks.
+       The algorithm assigns all nodes into the same core-periphery pair by construction, i.e., c[node_name] =0 for all node_name.
+
+    .. rubric:: Reference
+
+        [1] P. Rombach, M. A. Porter, J. H. Fowler, and P. J. Mucha. Core-Periphery Structure in Networks (Revisited). SIAM Review, 59(3):619–646, 2017
+
+    """
+
+    def __init__(self, num_runs=10, alpha=0.5, beta=0.8, algorithm="ls"):
+        self.num_runs = num_runs
+        self.alpha = alpha
+        self.beta = beta
+        self.algorithm = algorithm
+
+    def detect(self, G):
+        """Detect a single core-periphery pair.
+
+        Parameters
+        ----------
+        G : NetworkX graph object
+
+        Examples
+        --------
+        >>> import networkx as nx
+        >>> import cpnet
+        >>> G = nx.karate_club_graph()  # load the karate club network.
+        >>> rb = cp.Rombach(algorithm='ls') # label switching algorithm
+        >>> rb.detect(G)
+        >>> rb = cp.Rombach(algorithm='sa') # simulated annealing
+        >>> rb.detect(G)
+
+        """
+
+        Qbest = -100
+        cbest = 0
+        xbest = 0
+        qbest = 0
+        A, nodelabel = utils.to_adjacency_matrix(G)
+        self.Q_ = 0
+        for i in range(self.num_runs):
+            if self.algorithm == "ls":
+                x, Q = self._label_switching(A, self.alpha, self.beta)
+            elif self.algorithm == "sa":
+                x, Q = self._simaneal(A, nodelist, self.alpha, self.beta)
+            if Qbest < Q:
+                Qbest = Q
+                xbest = x
+                qbest = Q
+
+        self.nodelabel = nodelabel
+        self.c_ = np.zeros(x.size).astype(int)
+        self.x_ = x.astype(int)
+        self.Q_ = qbest
+        self.qs_ = [qbest]
+
+    def _label_switching(self, A, alpha, beta):
+
+        ndord = _rombach_label_switching_(
+            A.indptr, A.indices, A.data, A.shape[0], self.alpha, self.beta
+        )
+        x = np.array(
+            [_calc_coreness(order, A.shape[0], alpha, beta) for order in ndord]
+        )
+        Q = x.T @ A @ x
+        return x, Q
+
+    def _simaneal(self, A, nodelist, alpha, beta):
+
+        N = A.shape[0]
+
+        nodes = list(range(N))
+        random.shuffle(nodes)
+        nodes = np.array(nodes)
+
+        sa = SimAlg(A, nodes, self.alpha, self.beta)
+        od, self.Q_ = sa.anneal()
+
+        x = sa.corevector(od, self.alpha, self.beta)
+        x = x.T.tolist()[0]
+
+        Q = x.T @ A @ x
+        return x, Q
+
+    def _score(self, A, c, x):
+        return [x.T @ A @ x]
+
+
 class SimAlg(Annealer):
     def __init__(self, A, x, alpha, beta):
 
@@ -121,141 +259,3 @@ def _rombach_label_switching_(A_indptr, A_indices, A_data, N, alpha, beta):
             ndord[nextnid] = tmp
         itnum += 1
     return ndord
-
-
-class Rombach(CPAlgorithm):
-    """Rombach's algorithm for finding continuous core-periphery structure.
-    
-    Parameters
-    ----------
-    num_runs : int
-        Number of runs of the algorithm  (optional, default: 1).  
-
-    alpha : float
-        Sharpness of core-periphery boundary (optional, default: 0.5). 
-        
-        alpha=0 or alpha=1 gives the fuzziest or sharpest boundary, respectively.   
-
-    beta : float
-        Fraction of peripheral nodes (optional, default: 0.8) 
-
-    algorithm : str
-        Optimisation algorithm (optional, default: 'ls') 
-            In the original paper [1], the authors adopted a simulated annealing to optimise the objective function, which is computationally demanding. 
-            To mitigate the computational cost, a label switching algorithm is implemented in cpnet.
-            One can choose either algorithm by specifying algorithm='ls' (i.e., label switching) or algorithm='sa' (i.e., simulated annealing).
-
-    .. note::
-
-       The parameters of the simulated annealing such as the initial temperature and cooling schedule are different from those used in the original paper [1]. 
-    
-    
-    Examples
-    --------
-    Create this object.
-
-    >>> import cpnet as cpa    
-    >>> rb = cpa.Rombach()
-    
-    **Core-periphery detection**
-    
-    Detect core-periphery structure in network G (i.e., NetworkX object):
-    
-    >>> rb.detect(G) 
-    
-    Retrieve the ids of the core-periphery pair to which each node belongs:
-    
-    >>> pair_id = rb.get_pair_id() 
-    
-    Retrieve the coreness:
-
-    >>> coreness = rb.get_coreness() 
-        
-    .. note::
-
-       This algorithm can accept unweighted and weighted networks.
-       The algorithm assigns all nodes into the same core-periphery pair by construction, i.e., c[node_name] =0 for all node_name.
-
-    .. rubric:: Reference
-
-        [1] P. Rombach, M. A. Porter, J. H. Fowler, and P. J. Mucha. Core-Periphery Structure in Networks (Revisited). SIAM Review, 59(3):619–646, 2017    
-
-    """
-
-    def __init__(self, num_runs=10, alpha=0.5, beta=0.8, algorithm="ls"):
-        self.num_runs = num_runs
-        self.alpha = alpha
-        self.beta = beta
-        self.algorithm = algorithm
-
-    def detect(self, G):
-        """Detect a single core-periphery pair.
-    
-        Parameters
-        ----------
-        G : NetworkX graph object
-        
-        Examples
-        --------
-        >>> import networkx as nx
-        >>> import cpnet as cpa
-        >>> G = nx.karate_club_graph()  # load the karate club network. 
-        >>> rb = cp.Rombach(algorithm='ls') # label switching algorithm
-        >>> rb.detect(G)
-        >>> rb = cp.Rombach(algorithm='sa') # simulated annealing  
-        >>> rb.detect(G)
-
-        """
-
-        Qbest = -100
-        cbest = 0
-        xbest = 0
-        qbest = 0
-        A, nodelabel = utils.to_adjacency_matrix(G)
-        self.Q_ = 0
-        for i in range(self.num_runs):
-            if self.algorithm == "ls":
-                x, Q = self._label_switching(A, self.alpha, self.beta)
-            elif self.algorithm == "sa":
-                x, Q = self._simaneal(A, nodelist, self.alpha, self.beta)
-            if Qbest < Q:
-                Qbest = Q
-                xbest = x
-                qbest = Q
-
-        self.nodelabel = nodelabel
-        self.c_ = np.zeros(x.size).astype(int)
-        self.x_ = x.astype(int)
-        self.Q_ = qbest
-        self.qs_ = [qbest]
-
-    def _label_switching(self, A, alpha, beta):
-
-        ndord = _rombach_label_switching_(
-            A.indptr, A.indices, A.data, A.shape[0], self.alpha, self.beta
-        )
-        x = np.array(
-            [_calc_coreness(order, A.shape[0], alpha, beta) for order in ndord]
-        )
-        Q = x.T @ A @ x
-        return x, Q
-
-    def _simaneal(self, A, nodelist, alpha, beta):
-
-        N = A.shape[0]
-
-        nodes = list(range(N))
-        random.shuffle(nodes)
-        nodes = np.array(nodes)
-
-        sa = SimAlg(A, nodes, self.alpha, self.beta)
-        od, self.Q_ = sa.anneal()
-
-        x = sa.corevector(od, self.alpha, self.beta)
-        x = x.T.tolist()[0]
-
-        Q = x.T @ A @ x
-        return x, Q
-
-    def _score(self, A, c, x):
-        return [x.T @ A @ x]

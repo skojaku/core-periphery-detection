@@ -24,35 +24,35 @@ def _score_(A_indptr, A_indices, A_data, num_nodes, x):
 
 class MINRES(CPAlgorithm):
     """MINRES algorithm.
-    
-    MINRES algorithm for finding discrete core-periphery pairs [1], [2]. 
-        
+
+    MINRES algorithm for finding discrete core-periphery pairs [1], [2].
+
     Examples
     --------
     Create this object.
 
-    >>> import cpnet as cpa    
-    >>> mrs = cpa.MINRES()
-    
+    >>> import cpnet
+    >>> mrs = cpnet.MINRES()
+
     **Core-periphery detection**
-    
+
     Detect core-periphery structure in network G (i.e., NetworkX object):
-    
-    >>> mrs.detect(G) 
-    
+
+    >>> mrs.detect(G)
+
     Retrieve the ids of the core-periphery pair to which each node belongs:
-    
-    >>> pair_id = mrs.get_pair_id() 
-    
+
+    >>> pair_id = mrs.get_pair_id()
+
     Retrieve the coreness:
 
-    >>> coreness = mrs.get_coreness() 
+    >>> coreness = mrs.get_coreness()
 
     .. note::
 
        This algorithm accepts unweighted and undirected networks only.
        Also, the algorithm assigns all nodes into the same core-periphery pair by construction, i.e., c[node_name] =0 for all node_name.
-       This algorithm is deterministic, i.e, one obtains the same result at each run. 
+       This algorithm is deterministic, i.e, one obtains the same result at each run.
 
     .. rubric:: References
 
@@ -67,21 +67,21 @@ class MINRES(CPAlgorithm):
 
     def detect(self, G):
         """Detect a single core-periphery pair using the MINRES algorithm.
-            
+
         Parameters
         ----------
         G : NetworkX graph object
-        
+
         Examples
         --------
 
         >>> import networkx as nx
-        >>> import cpnet as cpa
-        >>> G = nx.karate_club_graph()  # load the karate club network. 
+        >>> import cpnet
+        >>> G = nx.karate_club_graph()  # load the karate club network.
         >>> mrs = cp.MINRES()
         >>> mrs.detect(G)
-        
-        
+
+
 
         """
 

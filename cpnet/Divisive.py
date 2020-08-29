@@ -5,6 +5,106 @@ from scipy import sparse
 import numba
 
 
+class Divisive(CPAlgorithm):
+    """Divisive algorithm.
+
+    An algorithm for finding multiple core-periphery pairs in networks.
+    This algorithm partitions a network into communities using the Louvain algorithm.
+    Then, it partitions each community into a core and a periphery using the BE algorithm.
+    The quality of a community is computed by that equipped with the BE algorithm.
+
+    Parameters
+    ----------
+    num_runs : int
+        Number of runs of the algorithm (optional, default: 10)
+        Run the algorithm num_runs times. Then, this algorithm outputs the result yielding the maximum quality.
+
+    Examples
+    --------
+    Create this object.
+
+    >>> import cpnet
+    >>> dv = cpnet.Divisive()
+
+    **Core-periphery detection**
+
+    Detect core-periphery structure in network G (i.e., NetworkX object):
+
+    >>> dv.detect(G)
+
+    Retrieve the ids of the core-periphery pair to which each node belongs:
+
+    >>> pair_id = dv.get_pair_id()
+
+    Retrieve the coreness:
+
+    >>> coreness = dv.get_coreness()
+
+    .. note::
+
+       This algorithm accepts unweighted and undirected networks only.
+       This algorithm is stochastic, i.e., one would obtain different results at each run.
+
+    .. rubric:: Reference
+
+        [1] S. Kojaku and N. Masuda. Core-periphery structure requires something else in the network. New Journal of Physics, 20(4):43012, 2018
+
+    """
+
+    def __init__(self, num_runs=10):
+        self.num_runs = num_runs
+
+    def detect(self, G):
+        """Detect a single core-periphery pair using the Borgatti-Everett algorithm.
+
+        Parameters
+        ----------
+        G : NetworkX graph object
+
+        Examples
+        --------
+        >>> import networkx as nx
+        >>> import cpnet
+        >>> G = nx.karate_club_graph()  # load the karate club network.
+        >>> dv = cpnet.Divisive()
+        >>> dv.detect(G)
+        """
+
+        A, nodelabel = utils.to_adjacency_matrix(G)
+
+        be = BE()
+
+        # divide a network into communities
+        cids = _louvain_(A)
+
+        x = []
+        q = []
+        K = int(np.max(cids) + 1)
+        for c in range(K):
+            nodes = np.where(cids == c)[0]
+            As = A[nodes, :][:, nodes]
+            be.detect(As)
+            x += [be.x_[k] for k, node in enumerate(nodes)]
+            q += [be.score(As, be.c_, be.x_)[0]]
+
+        x = np.array(x)
+        self.nodelabel = nodelabel
+        self.c_ = cids.astype(int)
+        self.x_ = x.astype(int)
+        self.Q_ = np.sum(q)
+        self.qs_ = q
+
+    def _score(self, A, c, x):
+        N = A.shape[0]
+        be = BE()
+        q = []
+        for cid in range(np.max(c) + 1):
+            nodes = np.where(c == cid)[0]
+            As = A[nodes, :][:, nodes]
+            q += [be.score(As, np.ones(nodes.size), x[nodes])[0]]
+        return q
+
+
 @numba.jit(nopython=True, cache=True)
 def _label_switching_(A_indptr, A_indices, A_data, num_nodes, alpha=0.5):
 
@@ -133,103 +233,3 @@ def _louvain_(A):
     _, cids = np.unique(cids, return_inverse=True)
 
     return cids
-
-
-class Divisive(CPAlgorithm):
-    """Divisive algorithm.
-
-    An algorithm for finding multiple core-periphery pairs in networks.
-    This algorithm partitions a network into communities using the Louvain algorithm. 
-    Then, it partitions each community into a core and a periphery using the BE algorithm.
-    The quality of a community is computed by that equipped with the BE algorithm.
-        
-    Parameters
-    ----------
-    num_runs : int
-        Number of runs of the algorithm (optional, default: 10)
-        Run the algorithm num_runs times. Then, this algorithm outputs the result yielding the maximum quality. 
-    
-    Examples
-    --------
-    Create this object.
-
-    >>> import cpnet as cpa    
-    >>> dv = cpa.Divisive()
-    
-    **Core-periphery detection**
-    
-    Detect core-periphery structure in network G (i.e., NetworkX object):
-    
-    >>> dv.detect(G) 
-    
-    Retrieve the ids of the core-periphery pair to which each node belongs:
-    
-    >>> pair_id = dv.get_pair_id() 
-    
-    Retrieve the coreness:
-
-    >>> coreness = dv.get_coreness() 
-        
-    .. note::
-
-       This algorithm accepts unweighted and undirected networks only.
-       This algorithm is stochastic, i.e., one would obtain different results at each run.
-
-    .. rubric:: Reference
-
-        [1] S. Kojaku and N. Masuda. Core-periphery structure requires something else in the network. New Journal of Physics, 20(4):43012, 2018
-
-    """
-
-    def __init__(self, num_runs=10):
-        self.num_runs = num_runs
-
-    def detect(self, G):
-        """Detect a single core-periphery pair using the Borgatti-Everett algorithm.
-    
-        Parameters
-        ----------
-        G : NetworkX graph object
-        
-        Examples
-        --------
-        >>> import networkx as nx
-        >>> import cpnet as cpa
-        >>> G = nx.karate_club_graph()  # load the karate club network. 
-        >>> dv = cpa.Divisive()
-        >>> dv.detect(G)
-        """
-
-        A, nodelabel = utils.to_adjacency_matrix(G)
-
-        be = BE()
-
-        # divide a network into communities
-        cids = _louvain_(A)
-
-        x = []
-        q = []
-        K = int(np.max(cids) + 1)
-        for c in range(K):
-            nodes = np.where(cids == c)[0]
-            As = A[nodes, :][:, nodes]
-            be.detect(As)
-            x += [be.x_[k] for k, node in enumerate(nodes)]
-            q += [be.score(As, be.c_, be.x_)[0]]
-
-        x = np.array(x)
-        self.nodelabel = nodelabel
-        self.c_ = cids.astype(int)
-        self.x_ = x.astype(int)
-        self.Q_ = np.sum(q)
-        self.qs_ = q
-
-    def _score(self, A, c, x):
-        N = A.shape[0]
-        be = BE()
-        q = []
-        for cid in range(np.max(c) + 1):
-            nodes = np.where(c == cid)[0]
-            As = A[nodes, :][:, nodes]
-            q += [be.score(As, np.ones(nodes.size), x[nodes])[0]]
-        return q

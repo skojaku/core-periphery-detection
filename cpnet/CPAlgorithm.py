@@ -30,14 +30,14 @@ class CPAlgorithm(metaclass=ABCMeta):
 
     def get_pair_id(self):
         """Get core-periphery pair ID of each node.
-    
-        
+
+
         Returns
         -------
         c : dict
             Key: Node name
-            Value: IDs of core-periphery pair to which it belongs. 
-            
+            Value: IDs of core-periphery pair to which it belongs.
+
         """
         return self.pairing(self.nodelabel, self.c_)
 
@@ -47,17 +47,17 @@ class CPAlgorithm(metaclass=ABCMeta):
 
     def score(self, G, c, x):
         """Get score of core-periphery pairs.
-        
+
         Parameters
         ----------
-        G : Graph object. 
-        c : Dict object,  the keys and values of which are the name of node and its ID of belonging core-periphery pair.  
-        
-        
+        G : Graph object.
+        c : Dict object,  the keys and values of which are the name of node and its ID of belonging core-periphery pair.
+
+
         Returns
         -------
-        q : List. q[i] is the quality of core-periphery pair i.  
-            
+        q : List. q[i] is the quality of core-periphery pair i.
+
         """
         A, nodelabel = utils.to_adjacency_matrix(G)
         c = self.depairing(nodelabel, c)

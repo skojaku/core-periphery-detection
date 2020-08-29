@@ -51,82 +51,82 @@ def qstest(
     s_tilde=[],
 ):
     """(q,s)-test for core-periphery structure.
-    
-    This function computes the significance of individual core-periphery pairs using either the Erdos-Renyi or the configuration model as the null model. 
-    
+
+    This function computes the significance of individual core-periphery pairs using either the Erdos-Renyi or the configuration model as the null model.
+
     Parameters
     ----------
     pair_id : dict
 	keys and values of which are node names and IDs of core-periphery pairs, respectively.
-    
+
     coreness : dict
-	keys and values of which are node names and coreness, respectively. 
-    
-    G : NetworkX graph object 
-	
+	keys and values of which are node names and coreness, respectively.
+
+    G : NetworkX graph object
+
     cpa : CPAlgorithm class object
-	Core-periphery detection algorithm 
-    
+	Core-periphery detection algorithm
+
     significance_level : float
-	Significance level (optional, default 0.5) 
-    
+	Significance level (optional, default 0.5)
+
     null_model : function
 	Null model for generating randomised networks.
-       	Provide either config_model or erdos_renyi (optional, default config_model). 
-       	One can use another null models. 
-       	Specifically, one needs to define a function taking NetworkX graph object as input and randomised network as its output. 
+       	Provide either config_model or erdos_renyi (optional, default config_model).
+       	One can use another null models.
+       	Specifically, one needs to define a function taking NetworkX graph object as input and randomised network as its output.
        	Then, one gives the defined function, say myfunc,  to qstest by null_model=myfunc.
-    
+
     sfunc : function
 	Size function (optional, default sz_n)
-       In the (q,s)--test, one is required to provide a function for measuring the size of an individual core-periphery pair. By default, this function is the number of nodes in the core-periphery pair (i.e., sz_n). One can set sz_degree, which measures the size as the sum of the degree of nodes belonging to the core-periphery pair.  
-    
+       In the (q,s)--test, one is required to provide a function for measuring the size of an individual core-periphery pair. By default, this function is the number of nodes in the core-periphery pair (i.e., sz_n). One can set sz_degree, which measures the size as the sum of the degree of nodes belonging to the core-periphery pair.
+
     num_of_thread : function
 	Number of thread (optional, default 4)
-     
-    	The (q,s)--test uses multiple threads to compute the significance. 
-    
+
+    	The (q,s)--test uses multiple threads to compute the significance.
+
     num_of_rand_net : int
 	Number of randomised networks (optional, default 500)
-    
+
     Returns
     -------
     sig_pair_id : dict
-	keys and values of which are node names and IDs of core-periphery pairs, respectively. If nodes belong to insignificant core-periphery pair, then the values are None. 
+	keys and values of which are node names and IDs of core-periphery pairs, respectively. If nodes belong to insignificant core-periphery pair, then the values are None.
 
-    sig_coreness : dict 
+    sig_coreness : dict
 	significance[i] = True or significance[i] = False indicates core-periphery pair i is significant or insignificant, respectively. If nodes belong to insignificant core-periphery pair, then the values are None.
 
-    significance : list 
+    significance : list
 	significance[i] = True or significance[i] = False indicates core-periphery pair i is significant or insignificant, respectively.
-    
+
     p_values : list
 	p_values[i] is the p-value of core-periphery pair i.
-    
+
     Examples
     --------
     Detect core-periphery pairs in the karate club network.
-    
-    >>> import cpnet as cpa	
-    >>> km = cpa.KM_config()
-    >>> km.detect(G) 
-    >>> pair_id = km.get_pair_id() 
+
+    >>> import cpnet
+    >>> km = cpnet.KM_config()
+    >>> km.detect(G)
+    >>> pair_id = km.get_pair_id()
     >>> coreness = km.get_coreness()
-    
-    Examine the significance of each core-periphery pair using the configuration model:	
-    
-    >>> sig_pair_id, sig_coreness, significance, p_values = cpa.qstest(pair_id, coreness, G, km)
-    
+
+    Examine the significance of each core-periphery pair using the configuration model:
+
+    >>> sig_pair_id, sig_coreness, significance, p_values = cpnet.qstest(pair_id, coreness, G, km)
+
     or
-    
-    >>> sig_pair_id, sig_coreness, significance, p_values = cpa.qstest(pair_id, coreness, G, km, null_model=config_model)
-    
+
+    >>> sig_pair_id, sig_coreness, significance, p_values = cpnet.qstest(pair_id, coreness, G, km, null_model=config_model)
+
     Examine the significance of each core-periphery pair using the Erdos-Renyi random graph:
-    
-    >>>  sig_pair_id, sig_coreness, significance, p_values = cpa.qstest(pair_id, coreness, G, km, null_model=erdos_renyi)
-    	
+
+    >>>  sig_pair_id, sig_coreness, significance, p_values = cpnet.qstest(pair_id, coreness, G, km, null_model=erdos_renyi)
+
     .. rubric:: Reference
-    
+
     Sadamori Kojaku and Naoki Masuda.
     A generalised significance test for individual communities in networks.
     Scientific Reports, 8:7351 (2018)

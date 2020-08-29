@@ -5,6 +5,90 @@ from . import utils
 import numba
 
 
+class Surprise(CPAlgorithm):
+    """ Core-periphery detection by Surprise
+
+    Parameters
+    ----------
+    num_runs : int
+           Number of runs of the algorithm (optional, default: 1)
+           Run the algorithm num_runs times. Then, this algorithm outputs the result yielding the maximum quality.
+
+    Examples
+    --------
+    Create this object.
+
+    >>> import cpnet
+    >>> spr = cpnet.Surprise()
+
+    **Core-periphery detection**
+
+    Detect core-periphery structure in network G (i.e., NetworkX object):
+
+    >>> spr.detect(G)
+
+    Retrieve the ids of the core-periphery pair to which each node belongs:
+
+    >>> pair_id = spr.get_pair_id()
+
+    Retrieve the coreness:
+
+    >>> coreness = spr.get_coreness()
+
+    .. note::
+
+       The implemented algorithm accepts unweighted and undirected networks only.
+       The algorithm finds a single CP pair in the given network, i.e., c[node_name] =0 for all node_name.
+       This algorithm is stochastic, i.e., one would obtain different results at each run.
+
+    .. rubric:: Reference
+
+    [1] J. van Lidth de Jeude, G. Caldarelli, T. Squartini. Detecting Core-Periphery Structures by Surprise. EPL, 125, 2019
+
+    """
+
+    def __init__(self):
+        self.num_runs = 1
+
+    def detect(self, G):
+        """Detect a single core-periphery pair using the Borgatti-Everett algorithm.
+
+        Parameters
+        ----------
+        G : NetworkX graph object
+
+        Examples
+        --------
+        >>> import networkx as nx
+        >>> import cpnet
+        >>> G = nx.karate_club_graph()  # load the karate club network.
+        >>> spr = cpnet.Surprise()
+        >>> spr.detect(G)
+        """
+
+        A, nodelabel = utils.to_adjacency_matrix(G)
+
+        N = A.shape[0]
+        xbest = np.zeros(N)
+        qbest = 0
+        for it in range(self.num_runs):
+            x, q = _detect_(A.indptr, A.indices, A.data, A.shape[0])
+            if q < qbest:
+                xbest = x
+                qbest = q
+
+        self.nodelabel = nodelabel
+        self.c_ = np.zeros(N).astype(int)
+        self.x_ = x.astype(int)
+        self.Q_ = qbest
+        self.qs_ = [qbest]
+
+    def _score(self, A, c, x):
+        num_nodes = A.shape[0]
+        qs = _score_(A.indptr, A.indices, A.data, num_nodes, x)
+        return [qs]
+
+
 @numba.jit(nopython=True, cache=True)
 def _mat_prod_(A_indptr, A_indices, A_data, N, x):
     y = np.zeros(N)
@@ -148,87 +232,3 @@ def _slog(numer, denom, s):
 
 def _score_(A_indptr, A_indices, A_data, N, x):
     return -_calculateSurprise_(A_indptr, A_indices, A_data, N, x)
-
-
-class Surprise(CPAlgorithm):
-    """ Core-periphery detection by Surprise
-
-    Parameters
-    ----------
-    num_runs : int
-           Number of runs of the algorithm (optional, default: 1)
-           Run the algorithm num_runs times. Then, this algorithm outputs the result yielding the maximum quality. 
-    
-    Examples
-    --------
-    Create this object.
-
-    >>> import cpnet as cpa    
-    >>> spr = cpa.Surprise()
-    
-    **Core-periphery detection**
-    
-    Detect core-periphery structure in network G (i.e., NetworkX object):
-    
-    >>> spr.detect(G) 
-    
-    Retrieve the ids of the core-periphery pair to which each node belongs:
-    
-    >>> pair_id = spr.get_pair_id() 
-    
-    Retrieve the coreness:
-
-    >>> coreness = spr.get_coreness() 
-        
-    .. note::
-
-       The implemented algorithm accepts unweighted and undirected networks only.
-       The algorithm finds a single CP pair in the given network, i.e., c[node_name] =0 for all node_name.
-       This algorithm is stochastic, i.e., one would obtain different results at each run.
-
-    .. rubric:: Reference
-
-    [1] J. van Lidth de Jeude, G. Caldarelli, T. Squartini. Detecting Core-Periphery Structures by Surprise. EPL, 125, 2019
-
-    """
-
-    def __init__(self):
-        self.num_runs = 1
-
-    def detect(self, G):
-        """Detect a single core-periphery pair using the Borgatti-Everett algorithm.
-    
-        Parameters
-        ----------
-        G : NetworkX graph object
-        
-        Examples
-        --------
-        >>> import networkx as nx
-        >>> import cpnet as cpa
-        >>> G = nx.karate_club_graph()  # load the karate club network. 
-        >>> spr = cpa.Surprise()
-        >>> spr.detect(G)
-        """
-
-        A, nodelabel = utils.to_adjacency_matrix(G)
-
-        N = A.shape[0]
-        xbest = np.zeros(N)
-        qbest = 0
-        for it in range(self.num_runs):
-            x, q = _detect_(A.indptr, A.indices, A.data, A.shape[0])
-            if q < qbest:
-                xbest = x
-                qbest = q
-
-        self.nodelabel = nodelabel
-        self.c_ = np.zeros(N).astype(int)
-        self.x_ = x.astype(int)
-        self.Q_ = qbest
-        self.qs_ = [qbest]
-
-    def _score(self, A, c, x):
-        num_nodes = A.shape[0]
-        qs = _score_(A.indptr, A.indices, A.data, num_nodes, x)
-        return [qs]

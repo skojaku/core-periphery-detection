@@ -7,37 +7,37 @@ import numba
 
 class LowRankCore(CPAlgorithm):
     """LowRankCore algorithm.
-    
+
     LowRankCore algorithm introduced in Ref.~ [1]
-    
+
     Parameters
     ----------
     beta : float
         Minimum fraction of core or peripheral nodes.
         This parameter ensures :math:`\\beta \\leq \\frac{Nc}{N_c + N_p}, \\frac{Np}{N_c + N_p}`, where
         :math:`N_c` and  :math:`N_p` are the number of core and peripheral nodes, respectively.  (optional, default: 0.1)
-        
+
     Examples
     --------
     Create this object.
 
-    >>> import cpnet as cpa    
-    >>> lrc = cpa.LowRankCore()
-    
+    >>> import cpnet
+    >>> lrc = cpnet.LowRankCore()
+
     **Core-periphery detection**
-    
+
     Detect core-periphery structure in network G (i.e., NetworkX object):
-    
-    >>> lrc.detect(G) 
-    
+
+    >>> lrc.detect(G)
+
     Retrieve the ids of the core-periphery pair to which each node belongs:
-    
-    >>> pair_id = lrc.get_pair_id() 
-    
+
+    >>> pair_id = lrc.get_pair_id()
+
     Retrieve the coreness:
 
-    >>> coreness = lrc.get_coreness() 
-        
+    >>> coreness = lrc.get_coreness()
+
     .. note::
 
        This algorithm can accept unweighted and weighted networks.
@@ -54,16 +54,16 @@ class LowRankCore(CPAlgorithm):
 
     def detect(self, G):
         """Detect a single core-periphery pair.
-    
+
         Parameters
         ----------
         G : NetworkX graph object
-        
+
         Examples
         --------
         >>> import networkx as nx
-        >>> import cpnet as cpa
-        >>> G = nx.karate_club_graph()  # load the karate club network. 
+        >>> import cpnet
+        >>> G = nx.karate_club_graph()  # load the karate club network.
         >>> lrc = cp.LowRankCore()
         >>> lrc.detect(G)
 
@@ -151,37 +151,37 @@ class LowRankCore(CPAlgorithm):
 
 class LapCore(CPAlgorithm):
     """LapCore algorithm.
-    
+
     LapCore algorithm introduced in Ref.~ [1]
-    
+
     Parameters
     ----------
     beta : float
         Minimum fraction of core or peripheral nodes.
         This parameter ensures :math:`\\beta \\leq \\frac{Nc}{N_c + N_p}, \\frac{Np}{N_c + N_p}`, where
         :math:`N_c` and  :math:`N_p` are the number of core and peripheral nodes, respectively.  (optional, default: 0.1)
-        
+
     Examples
     --------
     Create this object.
 
-    >>> import cpnet as cpa    
-    >>> lc = cpa.LapCore()
-    
+    >>> import cpnet
+    >>> lc = cpnet.LapCore()
+
     **Core-periphery detection**
-    
+
     Detect core-periphery structure in network G (i.e., NetworkX object):
-    
-    >>> lc.detect(G) 
-    
+
+    >>> lc.detect(G)
+
     Retrieve the ids of the core-periphery pair to which each node belongs:
-    
-    >>> pair_id = lc.get_pair_id() 
-    
+
+    >>> pair_id = lc.get_pair_id()
+
     Retrieve the coreness:
 
-    >>> coreness = lc.get_coreness() 
-        
+    >>> coreness = lc.get_coreness()
+
     .. note::
 
        This algorithm can accept unweighted and weighted networks.
@@ -198,16 +198,16 @@ class LapCore(CPAlgorithm):
 
     def detect(self, G):
         """Detect a single core-periphery pair.
-    
+
         Parameters
         ----------
         G : NetworkX graph object
-        
+
         Examples
         --------
         >>> import networkx as nx
-        >>> import cpnet as cpa
-        >>> G = nx.karate_club_graph()  # load the karate club network. 
+        >>> import cpnet
+        >>> G = nx.karate_club_graph()  # load the karate club network.
         >>> lc = cp.LapCore()
         >>> lc.detect(G)
 
@@ -294,30 +294,30 @@ class LapCore(CPAlgorithm):
 
 class LapSgnCore(CPAlgorithm):
     """LowSgnCore algorithm.
-    
+
     LapSgnCore algorithm introduced in Ref.~ [1]
-        
+
     Examples
     --------
     Create this object.
 
-    >>> import cpnet as cpa    
-    >>> lsc = cpa.LapSgnCore()
-    
+    >>> import cpnet
+    >>> lsc = cpnet.LapSgnCore()
+
     **Core-periphery detection**
-    
+
     Detect core-periphery structure in network G (i.e., NetworkX object):
-    
-    >>> lsc.detect(G) 
-    
+
+    >>> lsc.detect(G)
+
     Retrieve the ids of the core-periphery pair to which each node belongs:
-    
-    >>> pair_id = lsc.get_pair_id() 
-    
+
+    >>> pair_id = lsc.get_pair_id()
+
     Retrieve the coreness:
 
-    >>> coreness = lsc.get_coreness() 
-        
+    >>> coreness = lsc.get_coreness()
+
     .. note::
 
        This algorithm can accept unweighted and weighted networks.
@@ -334,16 +334,16 @@ class LapSgnCore(CPAlgorithm):
 
     def detect(self, G):
         """Detect a single core-periphery pair.
-    
+
         Parameters
         ----------
         G : NetworkX graph object
-        
+
         Examples
         --------
         >>> import networkx as nx
-        >>> import cpnet as cpa
-        >>> G = nx.karate_club_graph()  # load the karate club network. 
+        >>> import cpnet
+        >>> G = nx.karate_club_graph()  # load the karate club network.
         >>> lsc = cp.LapSgnCore()
         >>> lsc.detect(G)
 

@@ -3,6 +3,102 @@ from . import utils
 import numba
 
 
+class KM_config(CPAlgorithm):
+    """Kojaku-Masuda algorithm with the configuration model.
+
+	This algorithm finds multiple core-periphery pairs in networks.
+	In the detection of core-periphery pairs, the configuration model is used as the null model.
+
+	Parameters
+	----------
+	num_runs : int
+		Number of runs of the algorithm  (optional, default: 1).
+
+	Examples
+	--------
+	Create this object.
+
+	>>> import cpnet
+	>>> km = cpnet.KM_config()
+
+	**Core-periphery detection**
+
+	Detect core-periphery structure in network G (i.e., NetworkX object):
+
+	>>> km.detect(G)
+
+	Retrieve the ids of the core-periphery pair to which each node belongs:
+
+	>>> pair_id = km.get_pair_id()
+
+	Retrieve the coreness:
+
+	>>> coreness = km.get_coreness()
+
+	.. note::
+
+	   This algorithm can accept unweighted and weighted networks.
+
+	.. rubric:: Reference
+
+        [1] S. Kojaku and N. Masuda. Core-periphery structure requires something else in networks. New J. Phys. 2018
+
+	"""
+
+    def __init__(self, num_runs=10):
+        self.num_runs = num_runs
+        self.alpha = 0.5
+
+    def detect(self, G):
+        """Detect multiple core-periphery pairs.
+
+	Parameters
+	----------
+	G : NetworkX graph object
+
+	Examples
+	--------
+	>>> import networkx as nx
+	>>> import cpnet
+	>>> G = nx.karate_club_graph()  # load the karate club network.
+	>>> km = cp.KM_config() # label switching algorithm
+	>>> km.detect(G)
+	"""
+        A, nodelabel = utils.to_adjacency_matrix(G)
+
+        c = x = None
+        Q = -np.inf
+        for i in range(self.num_runs):
+            cidsi, xi = _label_switching_(
+                A.indptr, A.indices, A.data, A.shape[0], alpha=self.alpha
+            )
+            _, cidsi = np.unique(cidsi, return_inverse=True)
+
+            Qi, qsi = _score_(
+                A.indptr, A.indices, A.data, cidsi, xi, A.shape[0], alpha=self.alpha
+            )
+
+            if Qi > Q:
+                Q = Qi
+                qs = qsi.copy()
+                cids = cidsi.copy()
+                x = xi.copy()
+
+        self.nodelabel = nodelabel
+        self.c_ = cids.astype(int)
+        self.x_ = x.astype(int)
+        self.Q_ = Q
+        self.qs_ = qs
+
+    def _score(self, A, c, x):
+        num_nodes = A.shape[0]
+        Q, qs = _score_(A.indptr, A.indices, A.data, c, x, num_nodes, self.alpha)
+        return qs
+
+    def significance(self):
+        return self.pvalues
+
+
 @numba.jit(nopython=True, cache=True)
 def _label_switching_(A_indptr, A_indices, A_data, num_nodes, alpha=0.5, itnum_max=50):
 
@@ -118,99 +214,3 @@ def _score_(A_indptr, A_indices, A_data, _c, _x, num_nodes, alpha=0.5):
         Q += q[k]
 
     return Q, q
-
-
-class KM_config(CPAlgorithm):
-    """Kojaku-Masuda algorithm with the configuration model.
-	
-	This algorithm finds multiple core-periphery pairs in networks. 
-	In the detection of core-periphery pairs, the configuration model is used as the null model. 	
-	
-	Parameters
-	----------
-	num_runs : int
-		Number of runs of the algorithm  (optional, default: 1).  
-
-	Examples
-	--------
-	Create this object.
-
-	>>> import cpnet as cpa	
-	>>> km = cpa.KM_config()
-	
-	**Core-periphery detection**
-	
-	Detect core-periphery structure in network G (i.e., NetworkX object):
-	
-	>>> km.detect(G) 
-	
-	Retrieve the ids of the core-periphery pair to which each node belongs:
-	
-	>>> pair_id = km.get_pair_id() 
-	
-	Retrieve the coreness:
-
-	>>> coreness = km.get_coreness() 
-		
-	.. note::
-
-	   This algorithm can accept unweighted and weighted networks.
-
-	.. rubric:: Reference
-
-        [1] S. Kojaku and N. Masuda. Core-periphery structure requires something else in networks. New J. Phys. 2018 
-
-	"""
-
-    def __init__(self, num_runs=10):
-        self.num_runs = num_runs
-        self.alpha = 0.5
-
-    def detect(self, G):
-        """Detect multiple core-periphery pairs.
-	
-		Parameters
-		----------
-		G : NetworkX graph object
-		
-		Examples
-		--------
-		>>> import networkx as nx
-		>>> import cpnet as cpa
-		>>> G = nx.karate_club_graph()  # load the karate club network. 
-		>>> km = cp.KM_config() # label switching algorithm
-		>>> km.detect(G)
-	"""
-        A, nodelabel = utils.to_adjacency_matrix(G)
-
-        c = x = None
-        Q = -np.inf
-        for i in range(self.num_runs):
-            cidsi, xi = _label_switching_(
-                A.indptr, A.indices, A.data, A.shape[0], alpha=self.alpha
-            )
-            _, cidsi = np.unique(cidsi, return_inverse=True)
-
-            Qi, qsi = _score_(
-                A.indptr, A.indices, A.data, cidsi, xi, A.shape[0], alpha=self.alpha
-            )
-
-            if Qi > Q:
-                Q = Qi
-                qs = qsi.copy()
-                cids = cidsi.copy()
-                x = xi.copy()
-
-        self.nodelabel = nodelabel
-        self.c_ = cids.astype(int)
-        self.x_ = x.astype(int)
-        self.Q_ = Q
-        self.qs_ = qs
-
-    def _score(self, A, c, x):
-        num_nodes = A.shape[0]
-        Q, qs = _score_(A.indptr, A.indices, A.data, c, x, num_nodes, self.alpha)
-        return qs
-
-    def significance(self):
-        return self.pvalues

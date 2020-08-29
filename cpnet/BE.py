@@ -3,6 +3,99 @@ import numba
 from joblib import Parallel, delayed
 
 
+class BE(CPAlgorithm):
+    """Borgatti Everett algorithm.
+
+    An algorithm for finding single core-periphery pair in networks.
+
+    Parameters
+    ----------
+    num_runs : int
+           Number of runs of the algorithm (optional, default: 10)
+           Run the algorithm num_runs times. Then, this algorithm outputs the result yielding the maximum quality.
+
+    Examples
+    --------
+    Create this object.
+
+    >>> import cpnet
+    >>> be = cpnet.BE()
+
+    **Core-periphery detection**
+
+    Detect core-periphery structure in network G (i.e., NetworkX object):
+
+    >>> be.detect(G)
+
+    Retrieve the ids of the core-periphery pair to which each node belongs:
+
+    >>> pair_id = be.get_pair_id()
+
+    Retrieve the coreness:
+
+    >>> coreness = be.get_coreness()
+
+    .. note::
+
+       This algorithm accepts unweighted and undirected networks only.
+       Also, the algorithm assigns all nodes into the same core-periphery pair by construction, i.e., c[node_name] =0 for all node_name.
+       This algorithm is stochastic, i.e., one would obtain different results at each run.
+
+    .. rubric:: Reference
+
+    [1] S. P. Borgatti and M. G. Everett. Models of core/periphery structures. Soc.~Netw., 21(4):375–395, 2000.
+
+    """
+
+    def __init__(self, num_runs=10):
+        self.num_runs = num_runs
+        self.n_jobs = 1
+
+    def detect(self, G):
+        """Detect a single core-periphery pair using the Borgatti-Everett algorithm.
+
+        Parameters
+        ----------
+        G : NetworkX graph object
+
+        Examples
+        --------
+        >>> import networkx as nx
+        >>> import cpnet
+        >>> G = nx.karate_club_graph()  # load the karate club network.
+        >>> be = cpnet.BE()
+        >>> be.detect(G)
+
+        """
+
+        A, nodelabel = utils.to_adjacency_matrix(G)
+
+        def _detect(A_indptr, A_indices, A_data, num_nodes):
+            x = _kernighan_lin_(A_indptr, A_indices, A_data, num_nodes)
+            x = x.astype(int)
+            cids = np.zeros(num_nodes).astype(int)
+            Q, qs = _score_(A_indptr, A_indices, A_data, cids, x, num_nodes)
+            return {"cids": cids, "x": x, "q": Q}
+
+        res = Parallel(n_jobs=self.n_jobs)(
+            delayed(_detect)(A.indptr, A.indices, A.data, A.shape[0])
+            for i in range(self.num_runs)
+        )
+        res = max(res, key=lambda x: x["q"])
+        cids, x, Q = res["cids"], res["x"], res["q"]
+
+        self.nodelabel = nodelabel
+        self.c_ = cids.astype(int)
+        self.x_ = x.astype(int)
+        self.Q_ = Q
+        self.qs_ = [Q]
+
+    def _score(self, A, c, x):
+        num_nodes = A.shape[0]
+        Q, qs = _score_(A.indptr, A.indices, A.data, c, x, num_nodes)
+        return qs
+
+
 @numba.jit(nopython=True, cache=True)
 def _kernighan_lin_(A_indptr, A_indices, A_data, num_nodes):
 
@@ -119,96 +212,3 @@ def _score_(A_indptr, A_indices, A_data, _c, _x, num_nodes):
         Q = -1
 
     return Q, [Q]
-
-
-class BE(CPAlgorithm):
-    """Borgatti Everett algorithm.
-
-    An algorithm for finding single core-periphery pair in networks.
-        
-    Parameters
-    ----------
-    num_runs : int
-           Number of runs of the algorithm (optional, default: 10)
-           Run the algorithm num_runs times. Then, this algorithm outputs the result yielding the maximum quality. 
-    
-    Examples
-    --------
-    Create this object.
-
-    >>> import cpnet as cpa    
-    >>> be = cpa.BE()
-    
-    **Core-periphery detection**
-    
-    Detect core-periphery structure in network G (i.e., NetworkX object):
-    
-    >>> be.detect(G) 
-    
-    Retrieve the ids of the core-periphery pair to which each node belongs:
-    
-    >>> pair_id = be.get_pair_id() 
-    
-    Retrieve the coreness:
-
-    >>> coreness = be.get_coreness() 
-        
-    .. note::
-
-       This algorithm accepts unweighted and undirected networks only.
-       Also, the algorithm assigns all nodes into the same core-periphery pair by construction, i.e., c[node_name] =0 for all node_name.
-       This algorithm is stochastic, i.e., one would obtain different results at each run.
-
-    .. rubric:: Reference
-
-    [1] S. P. Borgatti and M. G. Everett. Models of core/periphery structures. Soc.~Netw., 21(4):375–395, 2000.
-
-    """
-
-    def __init__(self, num_runs=10):
-        self.num_runs = num_runs
-        self.n_jobs = 1
-
-    def detect(self, G):
-        """Detect a single core-periphery pair using the Borgatti-Everett algorithm.
-    
-        Parameters
-        ----------
-        G : NetworkX graph object
-        
-        Examples
-        --------
-        >>> import networkx as nx
-        >>> import cpnet as cpa
-        >>> G = nx.karate_club_graph()  # load the karate club network. 
-        >>> be = cpa.BE()
-        >>> be.detect(G)
-
-        """
-
-        A, nodelabel = utils.to_adjacency_matrix(G)
-
-        def _detect(A_indptr, A_indices, A_data, num_nodes):
-            x = _kernighan_lin_(A_indptr, A_indices, A_data, num_nodes)
-            x = x.astype(int)
-            cids = np.zeros(num_nodes).astype(int)
-            Q, qs = _score_(A_indptr, A_indices, A_data, cids, x, num_nodes)
-            return {"cids": cids, "x": x, "q": Q}
-
-        res = Parallel(n_jobs=self.n_jobs)(
-            delayed(_detect)(A.indptr, A.indices, A.data, A.shape[0])
-            for i in range(self.num_runs)
-        )
-        res = max(res, key=lambda x: x["q"])
-        cids, x, Q = res["cids"], res["x"], res["q"]
-
-        self.nodelabel = nodelabel
-        self.c_ = cids.astype(int)
-        self.x_ = x.astype(int)
-        self.Q_ = Q
-        self.qs_ = [Q]
-
-    def _score(self, A, c, x):
-        num_nodes = A.shape[0]
-        Q, qs = _score_(A.indptr, A.indices, A.data, c, x, num_nodes)
-        return qs
