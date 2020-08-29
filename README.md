@@ -93,14 +93,32 @@ List of algorithm:
 The statistical test can be performed by 
 
 ```python
-   sig_c, sig_x, significant, p_values = cp.qstest(c, x, G, algorithm)
+   sig_c, sig_x, significant, p_values = cpnet.qstest(c, x, G, algorithm, significance_level = 0.05, num_of_thread = 4)
 ```
- - `sig_c` and `sig_x` are dict objects taking node name as its keys. The values of the dict objects are the same as the `c` and `x` but `None` for the nodes belonging to the insignificant core-periphery pairs. 
- - `significant` is a boolean list, where `significant[c]=True` or `significant[c]=False` indicates that the cth core-periphery pair is significant or insignificant, respectively. 
- - `p_values` is a float list, where `p_values[c]` is the p-value for the cth core-periphery pair under a null model (default is the configuration model).
+- `c` and `x` are the core-periphery pairs in question that will be tested by the statistical test
+- `G` is the graph object (Networkx.Graph)
+- `algorithm` is the algorithm that you used to get `c` and `x`
+- `significance_level` is the significance level. (Optional; Default is 0.05)
+- `num_of_thread` Number of threads to perform the statistical test (Optional; Default is 4)
+- `sig_c` and `sig_x` are dict objects taking node name as its keys. The values of the dict objects are the same as the `c` and `x` but `None` for the nodes belonging to the insignificant core-periphery pairs. 
+- `significant` is a boolean list, where `significant[c]=True` or `significant[c]=False` indicates that the cth core-periphery pair is significant or insignificant, respectively. 
+- `p_values` is a float list, where `p_values[c]` is the p-value for the cth core-periphery pair under a null model (default is the configuration model).
 
-The statistical test is performed at the individual groups. Thus, caution should be taken to a problem known as multiple testing problems, i.e., even if all tests should be insignificant,  as the number of tests increases, the chance of getting a significantly small p-value in one of the tests increases (false positives). 
-To circumvent this problem, `qstest` lowers the significance level using the Sidak correction and thus controls the chance of false positives. 
-The `significant` is the result after applying the Sidak correction. 
+Some core-periphery pairs may be deemed as insignificant but have a p-value smaller than the prescribed significance level.  
+This is because the significance level is automatically adjusted to suppress the false positives due to the multiple comparison problem using the Sidak correction. 
 
+The p-value is computed using the configuration model as the null model. You may use a different null model by passing a user-defined function as `null_model` argument to `qstest`. 
+For example, to use the Erdős–Rényi random graph as the null model, define  
 
+```python
+   def erdos_renyi(G):
+       n = G.number_of_nodes()
+       p = nx.density(G)
+       return nx.fast_gnp_random_graph(n, p)
+```
+
+Then, pass it to the argument of the qstest:
+
+```python
+   sig_c, sig_x, significant, p_values = cpnet.qstest(c, x, G, algorithm, significance_level = 0.05, null_model = erdos_renyi )
+```
