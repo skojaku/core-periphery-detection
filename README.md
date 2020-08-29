@@ -66,7 +66,7 @@ c = algorithm.get_pair_id()
 x = algorithm.get_coreness()
 ```
 
-`c` and `x` are python dict objects that takes node labels (i.e., `G.nodes()`) as keys. 
+`c` and `x` are python dict objects that take node labels (i.e., `G.nodes()`) as keys. 
 The values of `c` are integers indicating group ids: nodes having the same integer belong to the same group. 
 The values of `x` are float values indicating coreness, i.e., a level of belongingness to the core.
 For example,
@@ -92,7 +92,7 @@ Please see the source code for the parameters specific to the algorithms.
 | [cpnet.Rombach](cpnet/Rombach.py)  | P. Rombach, M. A. Porter, J. H. Fowler, and P. J. Mucha. Core-Periphery Structure in Networks (Revisited). SIAM Review, 59, 619–646, 2017 |
 | [cpnet.Rossa](cpnet/Rossa.py)  | F. Rossa, F. Dercole, and C. Piccardi. Profiling core-periphery network structure by random walkers. Scientific Reports, 3, 1467, 2013 |
 | [cpnet.Surprise](cpnet/Surprise.py) | J. van Lidth de Jeude, G. Caldarelli, T. Squartini. Detecting Core-Periphery Structures by Surprise. EPL, 125, 2019 |
-| [cpnet.KM_ER](cpnet/KM_ER.py) | S. Kojaku and N. Masuda. Finding multiple core-periphery pairs in network. Phys. Rev. 96, 052313, 2017 |
+| [cpnet.KM_ER](cpnet/KM_ER.py) | S. Kojaku and N. Masuda. Finding multiple core-periphery pairs in networks. Phys. Rev. 96, 052313, 2017 |
 | [cpnet.KM_config](cpnet/KM_config.py) | S. Kojaku and N. Masuda. Core-periphery structure requires something else in networks. New J. Phys. 2018 |
 | [cpnet.Divisive](cpnet/Divisive.py) | S. Kojaku and N. Masuda. Core-periphery structure requires something else in networks. New J. Phys. 2018 |
 
@@ -109,7 +109,7 @@ The statistical test can be performed by
 - `algorithm` is the algorithm that you used to get `c` and `x`
 - `significance_level` is the significance level. (Optional; Default is 0.05)
 - `num_of_thread` Number of threads to perform the statistical test (Optional; Default is 4)
-- `sig_c` and `sig_x` are dict objects taking node name as its keys. The values of the dict objects are the same as the `c` and `x` but `None` for the nodes belonging to the insignificant core-periphery pairs. 
+- `sig_c` and `sig_x` are dict objects taking node names as its keys. The values of the dict objects are the same as the `c` and `x` but `None` for the nodes belonging to the insignificant core-periphery pairs. 
 - `significant` is a boolean list, where `significant[c]=True` or `significant[c]=False` indicates that the cth core-periphery pair is significant or insignificant, respectively. 
 - `p_values` is a float list, where `p_values[c]` is the p-value for the cth core-periphery pair under a null model (default is the configuration model).
 
@@ -117,7 +117,7 @@ Some core-periphery pairs may be deemed as insignificant but have a p-value smal
 
 ### Use a different null model 
 
-The p-value is computed using the configuration model as the null model. You may use a different null model by passing a user-defined function as `null_model` argument to `qstest`. 
+The p-value is computed using the configuration model as the null model. You may use a different null model by passing a user-defined function as the `null_model` argument to `qstest`. 
 For example, to use the Erdős–Rényi random graph as the null model, define  
 
 ```python
