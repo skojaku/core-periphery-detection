@@ -8,13 +8,13 @@
 For pip, 
 
 ```bash
-  $ pip install cpnet
+pip install cpnet
 ```
 
 For conda,   
 
 ```bash
-  $ conda install -c conda-forge -c skojaku cpnet 
+conda install -c conda-forge -c skojaku cpnet 
 ```
 
 
@@ -121,5 +121,7 @@ For example, to use the Erdős–Rényi random graph as the null model, define
 Then, pass it to the argument of the qstest:
 
 ```python
-   sig_c, sig_x, significant, p_values = cpnet.qstest(c, x, G, algorithm, significance_level = 0.05, null_model = erdos_renyi )
+sig_c, sig_x, significant, p_values = cpnet.qstest(
+    c, x, G, algorithm, significance_level=0.05, null_model=erdos_renyi
+)
 ```
