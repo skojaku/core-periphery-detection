@@ -1,9 +1,21 @@
 # Core-periphery detection algorithm 
 
+A Python package for detecting core-periphery in networks. 
+This package contains several algorithms for detecting core-periphery structure in networks. 
+All algorithms are implemented in python, with a speed enhancement by numba, and can be used with few lines.   
 
 
 # Installation
 
+Before installing this package, please make sure that you have a Python with version 3.6 or above.
+
+There are two ways to install this package, conda or pip. If you already have a conda environment, conda is recommended. Otherwise, use pip for installation.  
+
+For conda,   
+
+```bash
+conda install -c conda-forge -c skojaku cpnet 
+```
 
 For pip, 
 
@@ -11,11 +23,6 @@ For pip,
 pip install cpnet
 ```
 
-For conda,   
-
-```bash
-conda install -c conda-forge -c skojaku cpnet 
-```
 
 
 Dependency:
