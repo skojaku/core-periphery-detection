@@ -71,21 +71,23 @@ For example,
 
 mean nodes A, C belong to group 1, A is a core, and C is a periphery for the group.
 
-List of algorithms:
+### List of algorithms
+
+Please see the source code for the parameters specific to the algorithms. 
 
 | Algorithm | Reference |
 |-----------|-----------|
-| [cpnet.BE](cpnet/BE.py) | S. P. Borgatti and M. G. Everett. Models of core/periphery structures. Soc.~Netw., 21(4):375–395, 2000 |
-| cpnet.MINRES  | S. Z. W.~ Lip. A fast algorithm for the discrete core/periphery bipartitioning problem. arXiv, pages 1102.5511, 2011 |
-| cpnet.LowRankCore  | M. Cucuringu, P. Rombach, S. H. Lee, and M. A. Porter Detection of core-periphery structure in networks using spectral methods and geodesic paths. Euro. J. Appl. Math., 27:846–887, 2016. |
-| cpnet.LapCore  | M. Cucuringu, P. Rombach, S. H. Lee, and M. A. Porter Detection of core-periphery structure in networks using spectral methods and geodesic paths. Euro. J. Appl. Math., 27:846–887, 2016. |
-| cpnet.LapSgnCore  | M. Cucuringu, P. Rombach, S. H. Lee, and M. A. Porter Detection of core-periphery structure in networks using spectral methods and geodesic paths. Euro. J. Appl. Math., 27:846–887, 2016. |
-| cpnet.Rombach  | P. Rombach, M. A. Porter, J. H. Fowler, and P. J. Mucha. Core-Periphery Structure in Networks (Revisited). SIAM Review, 59(3):619–646, 2017 |
-| cpnet.Rossa  | F. Rossa, F. Dercole, and C. Piccardi. Profiling core-periphery network structure by random walkers. Scientific Reports, 3, 1467, 2013 |
-| cpnet.Surprise | J. van Lidth de Jeude, G. Caldarelli, T. Squartini. Detecting Core-Periphery Structures by Surprise. EPL, 125, 2019 |
-| cpnet.KM_ER | S. Kojaku and N. Masuda. Finding multiple core-periphery pairs in network. Phys. Rev. 96, 052313, 2017 |
-| cpnet.KM_config | S. Kojaku and N. Masuda. Core-periphery structure requires something else in networks. New J. Phys. 2018 |
-| cpnet.Divisive | S. Kojaku and N. Masuda. Core-periphery structure requires something else in networks. New J. Phys. 2018 |
+| [cpnet.BE](cpnet/BE.py) | S. P. Borgatti and M. G. Everett. Models of core/periphery structures. Soc.~Netw., 21, 375–395, 2000 |
+| [cpnet.MINRES](cpnet/MINRES.py)  | S. Z. W.~ Lip. A fast algorithm for the discrete core/periphery bipartitioning problem. arXiv, pages 1102.5511, 2011 |
+| [cpnet.LowRankCore](cpnet/Cucuringu.py)  | M. Cucuringu, P. Rombach, S. H. Lee, and M. A. Porter Detection of core-periphery structure in networks using spectral methods and geodesic paths. Euro. J. Appl. Math., 846–887, 2016. |
+| [cpnet.LapCore](cpnet/Cucuringu.py)  | M. Cucuringu, P. Rombach, S. H. Lee, and M. A. Porter Detection of core-periphery structure in networks using spectral methods and geodesic paths. Euro. J. Appl. Math., 846–887, 2016. |
+| [cpnet.LapSgnCore](cpnet/Cucuringu.py) | M. Cucuringu, P. Rombach, S. H. Lee, and M. A. Porter Detection of core-periphery structure in networks using spectral methods and geodesic paths. Euro. J. Appl. Math., 846–887, 2016. |
+| [cpnet.Rombach](cpnet/Rombach.py)  | P. Rombach, M. A. Porter, J. H. Fowler, and P. J. Mucha. Core-Periphery Structure in Networks (Revisited). SIAM Review, 59, 619–646, 2017 |
+| [cpnet.Rossa](cpnet/Rossa.py)  | F. Rossa, F. Dercole, and C. Piccardi. Profiling core-periphery network structure by random walkers. Scientific Reports, 3, 1467, 2013 |
+| [cpnet.Surprise](cpnet/Surprise.py) | J. van Lidth de Jeude, G. Caldarelli, T. Squartini. Detecting Core-Periphery Structures by Surprise. EPL, 125, 2019 |
+| [cpnet.KM_ER](cpnet/KM_ER.py) | S. Kojaku and N. Masuda. Finding multiple core-periphery pairs in network. Phys. Rev. 96, 052313, 2017 |
+| [cpnet.KM_config](cpnet/KM_config.py) | S. Kojaku and N. Masuda. Core-periphery structure requires something else in networks. New J. Phys. 2018 |
+| [cpnet.Divisive](cpnet/Divisive.py) | S. Kojaku and N. Masuda. Core-periphery structure requires something else in networks. New J. Phys. 2018 |
 
 ## Statistical test
 
