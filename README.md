@@ -102,11 +102,11 @@ Please see the source code for the parameters specific to the algorithms.
 ### Detectable core-periphery structure 
 
 - Single pair of a core and a periphery:
-  - cpnet.BE, cpnet.MINRES, cpnet.LapCore, cpnet.LapSgnCore, cpnet.Surprise
+  - `cpnet.BE`, `cpnet.MINRES`, `cpnet.LapCore`, `cpnet.LapSgnCore`, `cpnet.Surprise`
 - Multiple pairs of a core and a periphery 
-  - cpnet.KM_ER, cpnet.KM_config, cpnet.Divisive
+  - `cpnet.KM_ER`, `cpnet.KM_config`, `cpnet.Divisive`
 - Continuous spectrum between a core and a periphery:  
-  - cpnet.Rombach, cpnet.Rossa 
+  - `cpnet.Rombach`, `cpnet.Rossa` 
 
 ## Statistical test
 
