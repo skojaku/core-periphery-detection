@@ -72,8 +72,8 @@ The values of `x` are float values indicating coreness, i.e., a level of belongi
 For example,
  
 ```python
-   c = {A: 0, B: 1, C: 0, D: 2 ..., 
-   x = {A: 1, B: 1, C: 0, D: 1 ...,
+c = {A: 0, B: 1, C: 0, D: 2 ..., 
+x = {A: 1, B: 1, C: 0, D: 1 ...,
 ```
 
 mean nodes A, C belong to group 1, A is a core, and C is a periphery for the group.
@@ -102,7 +102,7 @@ Please see the source code for the parameters specific to the algorithms.
 The statistical test can be performed by 
 
 ```python
-   sig_c, sig_x, significant, p_values = cpnet.qstest(c, x, G, algorithm, significance_level = 0.05, num_of_thread = 4)
+sig_c, sig_x, significant, p_values = cpnet.qstest(c, x, G, algorithm, significance_level = 0.05, num_of_thread = 4)
 ```
 - `c` and `x` are the core-periphery pairs in question that will be tested by the statistical test
 - `G` is the graph object (Networkx.Graph)
@@ -121,10 +121,10 @@ The p-value is computed using the configuration model as the null model. You may
 For example, to use the Erdős–Rényi random graph as the null model, define  
 
 ```python
-   def erdos_renyi(G):
-       n = G.number_of_nodes()
-       p = nx.density(G)
-       return nx.fast_gnp_random_graph(n, p)
+def erdos_renyi(G):
+    n = G.number_of_nodes()
+    p = nx.density(G)
+    return nx.fast_gnp_random_graph(n, p)
 ```
 
 Then, pass it to the argument of the qstest:
