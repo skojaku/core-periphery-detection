@@ -80,8 +80,6 @@ mean nodes A, C belong to group 1, A is a core, and C is a periphery for the gro
 
 ### List of algorithms
 
-Some algorithms detect continuous spectrum of a core and a periphery. 
-
 
 Please see the source code for the parameters specific to the algorithms. 
 
