@@ -51,7 +51,7 @@ import cpnet
 algorithm = cpnet.KM_config()
 ```
 
-Pass a graph object (networkx.Graph) to the algorithm:
+Pass a graph object (networkx.Graph or adjacency matrix in scipy.sparse format) to the algorithm:
 
 ```python
 import networkx as nx
