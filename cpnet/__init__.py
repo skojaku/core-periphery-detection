@@ -17,4 +17,4 @@ from .Rombach import *
 from .Rossa import *
 from .Divisive import *
 
-# from cpalgorithm import *
+# from cpnet import *

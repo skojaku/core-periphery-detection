@@ -142,7 +142,7 @@ class Rombach(CPAlgorithm):
     algorithm : str
         Optimisation algorithm (optional, default: 'ls') 
             In the original paper [1], the authors adopted a simulated annealing to optimise the objective function, which is computationally demanding. 
-            To mitigate the computational cost, a label switching algorithm is implemented in cpalgorithm.
+            To mitigate the computational cost, a label switching algorithm is implemented in cpnet.
             One can choose either algorithm by specifying algorithm='ls' (i.e., label switching) or algorithm='sa' (i.e., simulated annealing).
 
     .. note::
@@ -154,7 +154,7 @@ class Rombach(CPAlgorithm):
     --------
     Create this object.
 
-    >>> import cpalgorithm as cpa    
+    >>> import cpnet as cpa    
     >>> rb = cpa.Rombach()
     
     **Core-periphery detection**
@@ -198,7 +198,7 @@ class Rombach(CPAlgorithm):
         Examples
         --------
         >>> import networkx as nx
-        >>> import cpalgorithm as cpa
+        >>> import cpnet as cpa
         >>> G = nx.karate_club_graph()  # load the karate club network. 
         >>> rb = cp.Rombach(algorithm='ls') # label switching algorithm
         >>> rb.detect(G)

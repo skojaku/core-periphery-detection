@@ -118,7 +118,7 @@ class KM_ER(CPAlgorithm):
 	--------
 	Create this object.
 
-	>>> import cpalgorithm as cpa	
+	>>> import cpnet as cpa	
 	>>> km = cpa.KM_ER()
 	
 	**Core-periphery detection**
@@ -159,7 +159,7 @@ class KM_ER(CPAlgorithm):
 		Examples
 		--------
 		>>> import networkx as nx
-		>>> import cpalgorithm as cpa
+		>>> import cpnet as cpa
 		>>> G = nx.karate_club_graph()  # load the karate club network. 
 		>>> km = cp.KM_ER() # label switching algorithm
 		>>> km.detect(G)

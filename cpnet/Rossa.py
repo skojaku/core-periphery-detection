@@ -11,7 +11,7 @@ class Rossa(CPAlgorithm):
     --------
     Create this object.
 
-    >>> import cpalgorithm as cpa    
+    >>> import cpnet as cpa    
     >>> rs = cpa.Rossa()
     
     **Core-periphery detection**
@@ -54,7 +54,7 @@ class Rossa(CPAlgorithm):
         Examples
         --------
         >>> import networkx as nx
-        >>> import cpalgorithm as cpa
+        >>> import cpnet as cpa
         >>> G = nx.karate_club_graph()  # load the karate club network. 
         >>> rs = cp.Rossa()
         >>> rs.detect(G)

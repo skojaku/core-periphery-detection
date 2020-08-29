@@ -163,7 +163,7 @@ class Surprise(CPAlgorithm):
     --------
     Create this object.
 
-    >>> import cpalgorithm as cpa    
+    >>> import cpnet as cpa    
     >>> spr = cpa.Surprise()
     
     **Core-periphery detection**
@@ -188,7 +188,7 @@ class Surprise(CPAlgorithm):
 
     .. rubric:: Reference
 
-    [1] J. van Lidth de Jeude, G. Caldarelli, T. Squartini. Detecting Core-Periphery Structures by Surprise. Preprint arXiv:1810.04717 (2018).
+    [1] J. van Lidth de Jeude, G. Caldarelli, T. Squartini. Detecting Core-Periphery Structures by Surprise. EPL, 125, 2019
 
     """
 
@@ -205,7 +205,7 @@ class Surprise(CPAlgorithm):
         Examples
         --------
         >>> import networkx as nx
-        >>> import cpalgorithm as cpa
+        >>> import cpnet as cpa
         >>> G = nx.karate_club_graph()  # load the karate club network. 
         >>> spr = cpa.Surprise()
         >>> spr.detect(G)

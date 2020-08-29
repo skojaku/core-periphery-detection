@@ -153,7 +153,7 @@ class Divisive(CPAlgorithm):
     --------
     Create this object.
 
-    >>> import cpalgorithm as cpa    
+    >>> import cpnet as cpa    
     >>> dv = cpa.Divisive()
     
     **Core-periphery detection**
@@ -194,7 +194,7 @@ class Divisive(CPAlgorithm):
         Examples
         --------
         >>> import networkx as nx
-        >>> import cpalgorithm as cpa
+        >>> import cpnet as cpa
         >>> G = nx.karate_club_graph()  # load the karate club network. 
         >>> dv = cpa.Divisive()
         >>> dv.detect(G)

@@ -135,7 +135,7 @@ class KM_config(CPAlgorithm):
 	--------
 	Create this object.
 
-	>>> import cpalgorithm as cpa	
+	>>> import cpnet as cpa	
 	>>> km = cpa.KM_config()
 	
 	**Core-periphery detection**
@@ -176,7 +176,7 @@ class KM_config(CPAlgorithm):
 		Examples
 		--------
 		>>> import networkx as nx
-		>>> import cpalgorithm as cpa
+		>>> import cpnet as cpa
 		>>> G = nx.karate_club_graph()  # load the karate club network. 
 		>>> km = cp.KM_config() # label switching algorithm
 		>>> km.detect(G)

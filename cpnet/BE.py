@@ -136,7 +136,7 @@ class BE(CPAlgorithm):
     --------
     Create this object.
 
-    >>> import cpalgorithm as cpa    
+    >>> import cpnet as cpa    
     >>> be = cpa.BE()
     
     **Core-periphery detection**
@@ -179,7 +179,7 @@ class BE(CPAlgorithm):
         Examples
         --------
         >>> import networkx as nx
-        >>> import cpalgorithm as cpa
+        >>> import cpnet as cpa
         >>> G = nx.karate_club_graph()  # load the karate club network. 
         >>> be = cpa.BE()
         >>> be.detect(G)

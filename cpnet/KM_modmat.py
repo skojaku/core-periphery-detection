@@ -1,4 +1,4 @@
-import _cpalgorithm as _cp
+import _cpnet as _cp
 from .CPAlgorithm import *
 
 

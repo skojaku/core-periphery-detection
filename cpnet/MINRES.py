@@ -31,7 +31,7 @@ class MINRES(CPAlgorithm):
     --------
     Create this object.
 
-    >>> import cpalgorithm as cpa    
+    >>> import cpnet as cpa    
     >>> mrs = cpa.MINRES()
     
     **Core-periphery detection**
@@ -76,7 +76,7 @@ class MINRES(CPAlgorithm):
         --------
 
         >>> import networkx as nx
-        >>> import cpalgorithm as cpa
+        >>> import cpnet as cpa
         >>> G = nx.karate_club_graph()  # load the karate club network. 
         >>> mrs = cp.MINRES()
         >>> mrs.detect(G)

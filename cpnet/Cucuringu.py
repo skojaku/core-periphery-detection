@@ -21,7 +21,7 @@ class LowRankCore(CPAlgorithm):
     --------
     Create this object.
 
-    >>> import cpalgorithm as cpa    
+    >>> import cpnet as cpa    
     >>> lrc = cpa.LowRankCore()
     
     **Core-periphery detection**
@@ -62,7 +62,7 @@ class LowRankCore(CPAlgorithm):
         Examples
         --------
         >>> import networkx as nx
-        >>> import cpalgorithm as cpa
+        >>> import cpnet as cpa
         >>> G = nx.karate_club_graph()  # load the karate club network. 
         >>> lrc = cp.LowRankCore()
         >>> lrc.detect(G)
@@ -165,7 +165,7 @@ class LapCore(CPAlgorithm):
     --------
     Create this object.
 
-    >>> import cpalgorithm as cpa    
+    >>> import cpnet as cpa    
     >>> lc = cpa.LapCore()
     
     **Core-periphery detection**
@@ -206,7 +206,7 @@ class LapCore(CPAlgorithm):
         Examples
         --------
         >>> import networkx as nx
-        >>> import cpalgorithm as cpa
+        >>> import cpnet as cpa
         >>> G = nx.karate_club_graph()  # load the karate club network. 
         >>> lc = cp.LapCore()
         >>> lc.detect(G)
@@ -301,7 +301,7 @@ class LapSgnCore(CPAlgorithm):
     --------
     Create this object.
 
-    >>> import cpalgorithm as cpa    
+    >>> import cpnet as cpa    
     >>> lsc = cpa.LapSgnCore()
     
     **Core-periphery detection**
@@ -342,7 +342,7 @@ class LapSgnCore(CPAlgorithm):
         Examples
         --------
         >>> import networkx as nx
-        >>> import cpalgorithm as cpa
+        >>> import cpnet as cpa
         >>> G = nx.karate_club_graph()  # load the karate club network. 
         >>> lsc = cp.LapSgnCore()
         >>> lsc.detect(G)

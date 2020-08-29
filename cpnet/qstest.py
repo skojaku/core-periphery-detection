@@ -107,7 +107,7 @@ def qstest(
     --------
     Detect core-periphery pairs in the karate club network.
     
-    >>> import cpalgorithm as cpa	
+    >>> import cpnet as cpa	
     >>> km = cpa.KM_config()
     >>> km.detect(G) 
     >>> pair_id = km.get_pair_id() 
