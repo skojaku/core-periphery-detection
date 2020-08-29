@@ -104,8 +104,9 @@ The statistical test can be performed by
 - `significant` is a boolean list, where `significant[c]=True` or `significant[c]=False` indicates that the cth core-periphery pair is significant or insignificant, respectively. 
 - `p_values` is a float list, where `p_values[c]` is the p-value for the cth core-periphery pair under a null model (default is the configuration model).
 
-Some core-periphery pairs may be deemed as insignificant but have a p-value smaller than the prescribed significance level.  
-This is because the significance level is automatically adjusted to suppress the false positives due to the multiple comparison problem using the Sidak correction. 
+Some core-periphery pairs may be deemed as insignificant but have a p-value smaller than the prescribed significance level. This is because the significance level is automatically adjusted to suppress the false positives due to the multiple comparison problem using the Sidak correction. 
+
+### Use a different null model 
 
 The p-value is computed using the configuration model as the null model. You may use a different null model by passing a user-defined function as `null_model` argument to `qstest`. 
 For example, to use the Erdős–Rényi random graph as the null model, define  
