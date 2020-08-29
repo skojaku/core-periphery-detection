@@ -75,7 +75,7 @@ List of algorithms:
 
 | Algorithm | Reference |
 |-----------|-----------|
-| [cpnet.BE](../cpnet/BE.py) | S. P. Borgatti and M. G. Everett. Models of core/periphery structures. Soc.~Netw., 21(4):375–395, 2000 |
+| [cpnet.BE](cpnet/BE.py) | S. P. Borgatti and M. G. Everett. Models of core/periphery structures. Soc.~Netw., 21(4):375–395, 2000 |
 | cpnet.MINRES  | S. Z. W.~ Lip. A fast algorithm for the discrete core/periphery bipartitioning problem. arXiv, pages 1102.5511, 2011 |
 | cpnet.LowRankCore  | M. Cucuringu, P. Rombach, S. H. Lee, and M. A. Porter Detection of core-periphery structure in networks using spectral methods and geodesic paths. Euro. J. Appl. Math., 27:846–887, 2016. |
 | cpnet.LapCore  | M. Cucuringu, P. Rombach, S. H. Lee, and M. A. Porter Detection of core-periphery structure in networks using spectral methods and geodesic paths. Euro. J. Appl. Math., 27:846–887, 2016. |
