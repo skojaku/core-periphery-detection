@@ -81,7 +81,7 @@ All algorithms implemented in this package have the same inferface. This means t
 | Algorithm | Reference |
 |-----------|-----------|
 | [cpnet.BE](cpnet/BE.py) | S. P. Borgatti and M. G. Everett. Models of core/periphery structures. Soc. Netw., 21, 375–395, 2000 |
-| [cpnet.MINRES](cpnet/MINRES.py)  | S. Z. W. Lip. A fast algorithm for the discrete core/periphery bipartitioning problem. arXiv, pages 1102.5511, 2011 |
+| [cpnet.MINRES](cpnet/MINRES.py)  | S. Z. W. Lip. A fast algorithm for the discrete core/periphery bipartitioning problem. arXiv, 2011 |
 | [cpnet.LowRankCore](cpnet/Cucuringu.py)  | M. Cucuringu, P. Rombach, S. H. Lee, and M. A. Porter Detection of core-periphery structure in networks using spectral methods and geodesic paths. Euro. J. Appl. Math., 846–887, 2016 |
 | [cpnet.LapCore](cpnet/Cucuringu.py)  | M. Cucuringu, P. Rombach, S. H. Lee, and M. A. Porter Detection of core-periphery structure in networks using spectral methods and geodesic paths. Euro. J. Appl. Math., 846–887, 2016 |
 | [cpnet.LapSgnCore](cpnet/Cucuringu.py) | M. Cucuringu, P. Rombach, S. H. Lee, and M. A. Porter Detection of core-periphery structure in networks using spectral methods and geodesic paths. Euro. J. Appl. Math., 846–887, 2016 |
@@ -89,8 +89,8 @@ All algorithms implemented in this package have the same inferface. This means t
 | [cpnet.Rossa](cpnet/Rossa.py)  | F. Rossa, F. Dercole, and C. Piccardi. Profiling core-periphery network structure by random walkers. Scientific Reports, 3, 1467, 2013 |
 | [cpnet.Surprise](cpnet/Surprise.py) | J. van Lidth de Jeude, G. Caldarelli, T. Squartini. Detecting Core-Periphery Structures by Surprise. EPL, 125, 2019 |
 | [cpnet.KM_ER](cpnet/KM_ER.py) | S. Kojaku and N. Masuda. Finding multiple core-periphery pairs in networks. Phys. Rev. 96, 052313, 2017 |
-| [cpnet.KM_config](cpnet/KM_config.py) | S. Kojaku and N. Masuda. Core-periphery structure requires something else in networks. New J. Phys. 2018 |
-| [cpnet.Divisive](cpnet/Divisive.py) | S. Kojaku and N. Masuda. Core-periphery structure requires something else in networks. New J. Phys. 2018 |
+| [cpnet.KM_config](cpnet/KM_config.py) | S. Kojaku and N. Masuda. Core-periphery structure requires something else in networks. New J. Phys., 20, 043012, 2018 |
+| [cpnet.Divisive](cpnet/Divisive.py) | S. Kojaku and N. Masuda. Core-periphery structure requires something else in networks. New J. Phys., 20, 043012, 2018 |
 
 Some algorithms have tuning parameters. Please see the source code for the parameters specific to the algorithms. 
 
