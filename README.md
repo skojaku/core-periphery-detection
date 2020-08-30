@@ -1,15 +1,14 @@
-# Core-periphery detection algorithm 
+# A Python package for detecting core-periphery in networks
 
-A Python package for detecting core-periphery in networks. 
 This package contains several algorithms for detecting core-periphery structure in networks. 
-All algorithms are implemented in python, with a speed enhancement by numba, and can be used with few lines.   
+All algorithms are implemented in python, with a speed enhancement by numba, and can be used with minimal coding effort.   
 
 
 # Installation
 
-Before installing this package, please make sure that you have a Python with version 3.6 or above.
+Before installing this package, make sure that you have a **Python with version 3.6 or above**.
 
-There are two ways to install this package, conda or pip. If you already have a conda environment, conda is recommended. Otherwise, use pip for installation.  
+There are two ways to install this package, *conda* or *pip*. conda is recommended if you have a conda environment. Otherwise, use pip for installation.  
 
 For conda,   
 
@@ -22,8 +21,6 @@ For pip,
 ```bash
 pip install cpnet
 ```
-
-
 
 Dependency:
 - Python version >=3.6
@@ -78,10 +75,8 @@ x = {A: 1, B: 1, C: 0, D: 1 ...,
 
 mean nodes A, C belong to group 1, A is a core, and C is a periphery for the group.
 
-### List of algorithms
 
-
-Please see the source code for the parameters specific to the algorithms. 
+All algorithms implemented in this package have the same inferface. This means that you can use other algorithms by changing `conet.KM_config` to, for example, `cpnet.BE`. See the list of algorithms as follows:
 
 | Algorithm | Reference |
 |-----------|-----------|
@@ -96,6 +91,8 @@ Please see the source code for the parameters specific to the algorithms.
 | [cpnet.KM_ER](cpnet/KM_ER.py) | S. Kojaku and N. Masuda. Finding multiple core-periphery pairs in networks. Phys. Rev. 96, 052313, 2017 |
 | [cpnet.KM_config](cpnet/KM_config.py) | S. Kojaku and N. Masuda. Core-periphery structure requires something else in networks. New J. Phys. 2018 |
 | [cpnet.Divisive](cpnet/Divisive.py) | S. Kojaku and N. Masuda. Core-periphery structure requires something else in networks. New J. Phys. 2018 |
+
+Some algorithms have tuning parameters. Please see the source code for the parameters specific to the algorithms. 
 
 ### Detectable core-periphery structure 
 
@@ -123,7 +120,8 @@ sig_c, sig_x, significant, p_values = cpnet.qstest(c, x, G, algorithm, significa
 - `significant` is a boolean list, where `significant[c]=True` or `significant[c]=False` indicates that the cth core-periphery pair is significant or insignificant, respectively. 
 - `p_values` is a float list, where `p_values[c]` is the p-value for the cth core-periphery pair under a null model (default is the configuration model).
 
-Some core-periphery pairs may be deemed as insignificant but have a p-value smaller than the prescribed significance level. This is because the significance level is automatically adjusted to suppress the false positives due to the multiple comparison problem using the Sidak correction. 
+Some core-periphery pairs may be deemed as insignificant but have a p-value smaller than the prescribed significance level. This is because the judgement of statistical significance is made based on a different significance level; the qs-test automatically adjusts the significance level using the Sidak correction in order to control for the false positives due to the multiple comparison problem.    
+
 
 ### Use a different null model 
 
