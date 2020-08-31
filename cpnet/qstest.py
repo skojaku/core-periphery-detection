@@ -171,7 +171,7 @@ def qstest(
     significant = [False] * C
 
     cidx = 0
-    cid2newcid = -np.ones(C)
+    cid2newcid = -np.ones(C).astype(int)
     for cid in range(C):
         if (s_std <= 1e-30) or (q_std <= 1e-30):
             continue
