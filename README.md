@@ -1,4 +1,4 @@
-# A Python package for detecting core-periphery in networks
+# A Python package for detecting core-periphery structure in networks
 
 This package contains several algorithms for detecting core-periphery structure in networks. 
 All algorithms are implemented in python, with a speed enhancement by numba, and can be used with minimal coding effort.   
