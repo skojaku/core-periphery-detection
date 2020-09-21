@@ -1,7 +1,7 @@
 # A Python package for detecting core-periphery structure in networks
 
-This package contains several algorithms for detecting core-periphery structure in networks. 
-All algorithms are implemented in python, with a speed enhancement by numba, and can be used with minimal coding effort.   
+This package contains some algorithms for detecting core-periphery structure in networks. 
+All algorithms are implemented in python, with speed accelerations by numba, and can be used with minimal coding effort.   
 
 
 # Installation
@@ -64,8 +64,9 @@ x = algorithm.get_coreness()
 ```
 
 `c` and `x` are python dict objects that take node labels (i.e., `G.nodes()`) as keys. 
-The values of `c` are integers indicating group ids: nodes having the same integer belong to the same group. 
-The values of `x` are float values indicating coreness, i.e., a level of belongingness to the core.
+- The values of `c` are integers indicating group ids: nodes having the same integer belong to the same group. 
+- The values of `x` are float values indicating coreness ranging between 0 and 1. A larger value indicates that the node is closer to the core. In case of discrete core-periphery structure, the corenss can only take 0 or 1, with x[i]=1 or =0 indicating that node i belongs to a core or a periphery, respectively.
+
 For example,
  
 ```python
@@ -92,7 +93,7 @@ All algorithms implemented in this package have the same inferface. This means t
 | [cpnet.KM_config](cpnet/KM_config.py) | S. Kojaku and N. Masuda. Core-periphery structure requires something else in networks. New J. Phys., 20, 043012, 2018 |
 | [cpnet.Divisive](cpnet/Divisive.py) | S. Kojaku and N. Masuda. Core-periphery structure requires something else in networks. New J. Phys., 20, 043012, 2018 |
 
-Some algorithms have tuning parameters. Please see the source code for the parameters specific to the algorithms. 
+Some algorithms have tuning parameters. Please see the source code for the parameters specific to each algorithm. 
 
 ### Detectable core-periphery structure 
 
@@ -105,6 +106,9 @@ Some algorithms have tuning parameters. Please see the source code for the param
 
 ## Statistical test
 
+The algorithms label nodes as cores and peripheries such that the structure they constitute looks like a core-periphery structure. However, the detected structure may not be the core-periphery structure; it may be a regular graph, random network, or something else. For example, the algorithms label nodes as cores and peripheries even if the network is a regular graph. 
+
+It is crucial to inspect whether the detected structure is a core-periphery structure or not, which is why the statistical test comes in. This package has an implementation of a statistical test, *q-s test*, in which one runs the algorithm used to detect the core-periphery structure in question to many random networks. If the algorithm does not find a core-periphery structure stronger than the detected core-periphery structure, the detected core-periphery structure is considered as significant. See papers [here](https://www.nature.com/articles/s41598-018-25560-z) and [here](https://iopscience.iop.org/article/10.1088/1367-2630/aab547) for the method.
 
 The statistical test can be performed by 
 
@@ -120,12 +124,12 @@ sig_c, sig_x, significant, p_values = cpnet.qstest(c, x, G, algorithm, significa
 - `significant` is a boolean list, where `significant[c]=True` or `significant[c]=False` indicates that the cth core-periphery pair is significant or insignificant, respectively. 
 - `p_values` is a float list, where `p_values[c]` is the p-value for the cth core-periphery pair under a null model (default is the configuration model).
 
-Some core-periphery pairs may be deemed as insignificant but have a p-value smaller than the prescribed significance level. This is because the judgement of statistical significance is made based on a different significance level; the qs-test automatically adjusts the significance level using the Sidak correction in order to control for the false positives due to the multiple comparison problem.    
+Some core-periphery pairs have a p-value smaller than the prescribed significance level but deemed as insignificant. This is because the statistical significance is adjusted to control for the false positives due to the multiple comparison problem.    
 
 
 ### Use a different null model 
 
-The p-value is computed using the configuration model as the null model. You may use a different null model by passing a user-defined function as the `null_model` argument to `qstest`. 
+The p-value is computed using the configuration model as the null model. One can use a different null model by passing a user-defined function as the `null_model` argument to `qstest`. 
 For example, to use the Erdős–Rényi random graph as the null model, define  
 
 ```python
@@ -142,3 +146,9 @@ sig_c, sig_x, significant, p_values = cpnet.qstest(
     c, x, G, algorithm, significance_level=0.05, null_model=erdos_renyi
 )
 ```
+
+
+# Examples
+増田さんへ
+ここに2つか3つくらい例を載せようと思います。最初に使い方の手順を簡単に書きましたが、実際にどう使うのかを説明するために必要かなと思い、この提案をしています。
+例はpolitical blog, worldwide airport networkにアルゴリズムを適用して可視化するところまでをjupyter notebookに書き、リンクをここに貼ろうと考えています。github上はjupyter notebookを図入りで表示してくれるので、興味も引きやすいかなと思います。
