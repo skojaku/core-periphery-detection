@@ -118,8 +118,8 @@ sig_c, sig_x, significant, p_values = cpnet.qstest(c, x, G, algorithm, significa
 - `significance_level` is the significance level. (Optional; default is 0.05)
 - `num_of_thread` Number of threads to perform the statistical test (Optional; default is 4)
 - `sig_c` and `sig_x` are dict objects taking node names as its keys. The values of the dict objects are the same as the `c` and `x` but `None` for the nodes belonging to the insignificant core-periphery pairs. 
-- `significant` is a boolean list, where `significant[c]=True` or `significant[c]=False` indicates that the cth core-periphery pair is significant or insignificant, respectively. 
-- `p_values` is a float list, where `p_values[c]` is the p-value for the *c*[でいいのかな。c を italic にする。または c-th にする。cth はNGなので。他の cth も同様に直す。]th core-periphery pair under a null model (default is the configuration model).
+- `significant` is a boolean list, where `significant[c]=True` or `significant[c]=False` indicates that the c-th core-periphery pair is significant or insignificant, respectively. 
+- `p_values` is a float list, where `p_values[c]` is the p-value for the c-th core-periphery pair under a null model (default is the configuration model).
 
 Some core-periphery pairs have a p-value smaller than the prescribed significance level but deemed as insignificant. This is because the statistical significance is adjusted to control for the false positives due to the multiple comparison problem.    
 
