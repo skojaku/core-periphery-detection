@@ -149,3 +149,5 @@ sig_c, sig_x, significant, p_values = cpnet.qstest(
 増田さんへ
 ここに2つか3つくらい例を載せようと思います。最初に使い方の手順を簡単に書きましたが、実際にどう使うのかを説明するために実践例が必要かなと思い、この提案をしています。
 例はpolitical blog, worldwide airport networkにアルゴリズムを適用して可視化するところまでをjupyter notebookに書き、リンクをここに貼ろうと考えています。github上はjupyter notebookを図入りで表示してくれるので、興味も引きやすいかなと思います。 [絶対ある方がよい。例は多くてもよい。]
+- [Example 1 (Detection of core-periphery structure)](https://github.com/skojaku/core-periphery-detection/blob/add-notebook/notebooks/exampl1.ipynb)
+- [Example 2 (Statistical test)](https://github.com/skojaku/core-periphery-detection/blob/add-notebook/notebooks/exampl2.ipynb)
