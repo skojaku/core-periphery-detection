@@ -1,3 +1,4 @@
+# run conda skeleton pypi cpnet
 pkg='cpnet'
 array=( 3.6 3.7 3.8 )
 

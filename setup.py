@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 import os
 
-__version__ = "0.0.4"
+__version__ = "0.0.6"
 
 
 setup(
@@ -20,7 +20,10 @@ setup(
         "scipy>=1.5.2",
         "numba==0.50.0",
         "joblib>=0.16.0",
-        "tqdm",
+        "plotly>=4.10.0",
+        "seaborn>=0.11.0",
+        "pandas>=1.1.0",
+        "tqdm>=4.49.0",
     ],
     zip_safe=False,
     include_package_data=True,
