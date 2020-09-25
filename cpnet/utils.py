@@ -2,8 +2,10 @@ import numpy as np
 from scipy import sparse
 import numba
 import networkx as nx
+import pandas as pd
 import matplotlib as mpl
 import seaborn as sns
+import plotly.graph_objects as go
 
 
 def to_adjacency_matrix(net):
@@ -29,59 +31,9 @@ def to_nxgraph(net):
         return nx.from_numpy_array(net)
 
 
-def draw(
-    G,
-    c,
-    x,
-    ax,
-    font_size=0,
-    pos=None,
-    cmap=None,
-    draw_nodes_kwd={},
-    draw_edges_kwd={"edge_color": "#adadad"},
-    draw_labels_kwd={},
-):
-    """
-    
-    Plot the core-periphery structure in the networks
-    
-    Params
-    ------
-    G: networkx.Graph
-    c: dict
-        - key: node id given by G.noes()
-        - value: integer indicating the group id
-    x: dict
-        - key: node id given by G.noes()
-        - value: float indicating the coreness
-    ax: matplotlib.axis
-    font_size: int
-        Font size for node labels. Set 0 to hide the font. 
-    pos: dict
-        - key: node id given by G.noes()
-        - value: tuple (x, y) indicating the location
-    cmap: colormap
-    draw_nodes_kwd: dict
-        Parameter for networkx.draw_networkx_nodes
-    draw_edges_kwd: dict
-        Parameter for networkx.draw_networkx_edges
-    draw_labels_kwd: dict
-        Parameter for networkx.draw_networkx_labels
-        
-    Returns
-    ------
-    ax: matplotlib.axes
-    pos: dict
-        - key: node id given by G.noes()
-        - value: tuple (x, y) indicating the location
-    """
-
+def set_node_colors(G, c, x, cmap):
     # Count the number of groups
-    num_groups = len(np.unique(np.array(c.values())))
-
-    # Split node into residual and non-residual
-    residuals = [d for d in G.nodes() if (c[d] is None) or (x[d] is None)]
-    non_residuals = [d for d in G.nodes() if (c[d] is not None) and (x[d] is not None)]
+    num_groups = len(np.unique([d for d in c.values() if d is not None]))
 
     # Set up the palette
     if cmap is None:
@@ -97,23 +49,87 @@ def draw(
 
     # Calculate the color for each node using the palette
     cmap_coreness = [sns.light_palette(color, n_colors=12).as_hex() for color in cmap]
-    node_colors = [
-        cmap_coreness[c[d]][norm(x[d]) - 1]
-        for i, d in enumerate(G.nodes())
-        if x[d] is not None
+    cmap_coreness_dark = [
+        sns.dark_palette(color, n_colors=12).as_hex() for color in cmap
     ]
-    node_edge_colors = [cmap[c[d]] if x[d] == 0 else "#4d4d4d" for d in non_residuals]
+    node_colors = [
+        cmap_coreness[c[d]][norm(x[d]) - 1] if x[d] is not None else "#4d4d4d"
+        for i, d in enumerate(G.nodes())
+    ]
+    node_edge_colors = []
+    for i, d in enumerate(G.nodes()):
+        if x[d] is None:
+            node_edge_colors += ["#4d4d4d"]
+        else:
+            node_edge_colors += [cmap_coreness_dark[c[d]][-norm(x[d])]]
+    return node_colors, node_edge_colors
+
+
+def draw(
+    G,
+    c,
+    x,
+    ax,
+    draw_edge=True,
+    font_size=0,
+    pos=None,
+    cmap=None,
+    draw_nodes_kwd={},
+    draw_edges_kwd={"edge_color": "#adadad"},
+    draw_labels_kwd={},
+):
+    """
+    Plot the core-periphery structure in the networks
+
+    Params
+    ------
+    G: networkx.Graph
+    c: dict
+        - key: node id given by G.noes()
+        - value: integer indicating the group id
+    x: dict
+        - key: node id given by G.noes()
+        - value: float indicating the coreness
+    ax: matplotlib.axis
+    font_size: int
+        Font size for node labels. Set 0 to hide the font.
+    pos: dict
+        - key: node id given by G.nodes()
+        - value: tuple (x, y) indicating the location
+    cmap: colormap
+    draw_nodes_kwd: dict
+        Parameter for networkx.draw_networkx_nodes
+    draw_edges_kwd: dict
+        Parameter for networkx.draw_networkx_edges
+    draw_labels_kwd: dict
+        Parameter for networkx.draw_networkx_labels
+
+    Returns
+    ------
+    ax: matplotlib.axes
+    pos: dict
+        - key: node id given by G.noes()
+        - value: tuple (x, y) indicating the location
+    """
+
+    node_colors, node_edge_colors = set_node_colors(G, c, x, cmap)
 
     # Set the position of nodes
     if pos is None:
         pos = nx.spring_layout(G)
+    
+    # Split node into residual and non-residual
+    residuals = [d for d in G.nodes() if (c[d] is None) or (x[d] is None)]
+    non_residuals = [d for d in G.nodes() if (c[d] is not None) and (x[d] is not None)]
+
 
     # Draw
     nodes = nx.draw_networkx_nodes(
-        G, pos, node_color=node_colors, nodelist=non_residuals, ax=ax, **draw_nodes_kwd
+        G, pos, node_color=[ node_colors[i] for i, d in enumerate(G.nodes()) if x[d] is not None], nodelist=non_residuals, ax=ax, **draw_nodes_kwd
     )
     nodes.set_edgecolor(node_edge_colors)
-    draw_nodes_kwd["node_size"] = draw_nodes_kwd.get("node_size", 100)
+    draw_nodes_kwd_residual = draw_nodes_kwd.copy()
+    draw_nodes_kwd_residual["node_size"] = 0.1 * draw_nodes_kwd.get("node_size", 100)
     nodes = nx.draw_networkx_nodes(
         G,
         pos,
@@ -121,13 +137,81 @@ def draw(
         nodelist=residuals,
         node_shape="s",
         ax=ax,
-        **draw_nodes_kwd
+        **draw_nodes_kwd_residual
     )
     nodes.set_edgecolor("#4d4d4d")
 
-    nx.draw_networkx_edges(G, pos, ax=ax, **draw_edges_kwd)
+    if draw_edge:
+        nx.draw_networkx_edges(G, pos, ax=ax, **draw_edges_kwd)
+
     if font_size > 0:
         nx.draw_networkx_labels(G, pos, ax=ax, font_size=font_size, **draw_labels_kwd)
+
     ax.axis("off")
 
     return ax, pos
+
+def draw_interactive(G, c, x, hover_text=None, node_size=10.0, pos=None, cmap=None):
+
+    node_colors, node_edge_colors = set_node_colors(G, c, x, cmap)
+
+    if pos is None:
+        pos = nx.spring_layout(G)
+
+    nodelist = [d for d in G.nodes()]
+    group_ids = [c[d] if c[d] is not None else "residual" for d in nodelist]
+    coreness = [x[d] if x[d] is not None else "residual" for d in nodelist]
+    node_size_list = [(x[d] + 1) if x[d] is not None else 1 / 2 for d in nodelist]
+
+    pos_x = [pos[d][0] for d in nodelist]
+    pos_y = [pos[d][1] for d in nodelist]
+    df = pd.DataFrame(
+        {
+            "x": pos_x,
+            "y": pos_y,
+            "name": nodelist,
+            "group_id": group_ids,
+            "coreness": coreness,
+            "node_size": node_size_list,
+        }
+    )
+    df["marker"] = df["group_id"].apply(
+        lambda s: "circle" if s != "residual" else "square"
+    )
+
+    df["hovertext"] = df.apply(
+        lambda s: "{ht}<br>Group: {group}<br>Coreness: {coreness}".format(
+            ht="Node %s" % s["name"]
+            if hover_text is None
+            else hover_text.get(s["name"], ""),
+            group=s["group_id"],
+            coreness=s["coreness"],
+        ),
+        axis=1,
+    )
+
+    fig = go.Figure(
+        data=go.Scatter(
+            x=df["x"],
+            y=df["y"],
+            marker_size=df["node_size"],
+            marker_symbol=df["marker"],
+            hovertext=df["hovertext"],
+            hoverlabel=dict(namelength=0),
+            hovertemplate="%{hovertext}",
+            marker={
+                "color": node_colors,
+                "sizeref": 1.0 / node_size,
+                "line": {"color": node_edge_colors, "width": 1},
+            },
+            mode="markers",
+        ),
+    )
+    fig.update_layout(
+        autosize=False,
+        width=800,
+        height=800,
+        template="plotly_white",
+        # layout=go.Layout(xaxis={"showgrid": False}, yaxis={"showgrid": True}),
+    )
+    return fig
