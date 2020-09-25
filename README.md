@@ -76,8 +76,7 @@ x = {A: 1, B: 1, C: 0, D: 1 ...}
 
 means that nodes A and C belong to group 1, A is a core node, and C is a peripheral node of the group A belongs to.
 
-
-All algorithms implemented in this package have the same inferface. This means that you can use other algorithms by changing `conet.KM_config` to, for example, `cpnet.BE`. See the list of algorithms as follows:
+All algorithms implemented in this package have the same inferface. This means that you can use other algorithms by changing `cpnet.KM_config` to, for example, `cpnet.BE`. See the list of algorithms as follows:
 
 | Algorithm | Reference |
 |-----------|-----------|
@@ -118,8 +117,8 @@ sig_c, sig_x, significant, p_values = cpnet.qstest(c, x, G, algorithm, significa
 - `significance_level` is the significance level. (Optional; default is 0.05)
 - `num_of_thread` Number of threads to perform the statistical test (Optional; default is 4)
 - `sig_c` and `sig_x` are dict objects taking node names as its keys. The values of the dict objects are the same as the `c` and `x` but `None` for the nodes belonging to the insignificant core-periphery pairs. 
-- `significant` is a boolean list, where `significant[c]=True` or `significant[c]=False` indicates that the cth core-periphery pair is significant or insignificant, respectively. 
-- `p_values` is a float list, where `p_values[c]` is the p-value for the *c*[でいいのかな。c を italic にする。または c-th にする。cth はNGなので。他の cth も同様に直す。]th core-periphery pair under a null model (default is the configuration model).
+- `significant` is a boolean list, where `significant[k]=True` or `significant[k]=False` indicates that the k-th core-periphery pair is significant or insignificant, respectively. 
+- `p_values` is a float list, where `p_values[k]` is the p-value for the k-th core-periphery pair under a null model (default is the configuration model).
 
 Some core-periphery pairs have a p-value smaller than the prescribed significance level but deemed as insignificant. This is because the statistical significance is adjusted to control for the false positives due to the multiple comparison problem.    
 
@@ -143,9 +142,34 @@ sig_c, sig_x, significant, p_values = cpnet.qstest(
     c, x, G, algorithm, significance_level=0.05, null_model=erdos_renyi
 )
 ```
+## Visualization
 
+`cpnet` implements a drawing function based on networkx. 
+
+```python
+ax, pos = cpnet.draw(G, c, x, ax, draw_edge=False, draw_nodes_kwd={}, draw_edges_kwd={}, draw_labels_kwd={})
+```
+- `G` is the graph object (Networkx.Graph)
+- `c` and `x` are the core-periphery pairs
+- `ax` is the matplotlib axis
+- `draw_edge` is a boolean (Optional; Default False). Set `draw_edge = True` not to draw the edges (recommended if the network is large)
+- `draw_nodes_kwd={}`, `draw_edges_kwd={}`, and `draw_labels_kwd={}` are the keywords that are passed to networkx.draw_network_nodes, networkx.draw_network_edges, and networkx.draw_network_labels, respectively (see the [networkx documentation](https://networkx.github.io/documentation/stable/reference/drawing.html)). Useful when refining the figure.
+- `pos` is a dict object. The keys are the node ids given by G.nodes(). The values are tuples (x, y) indicating the positions of nodes.
+
+`cpnet` also implements a function for drawing an interactive figure based on plotly.
+
+```python
+ax, pos = cpnet.draw_interactive(G, c, x, hover_text)
+```
+- `G` is the graph object (Networkx.Graph)
+- `c` and `x` are the core-periphery pairs
+- `hover_text` is a dict object (optional), where the key is the node id given by G.nodes() and the value is the text to show in the toolbox.
+
+## Visualizing core-periphery
 
 # Examples
 増田さんへ
 ここに2つか3つくらい例を載せようと思います。最初に使い方の手順を簡単に書きましたが、実際にどう使うのかを説明するために実践例が必要かなと思い、この提案をしています。
 例はpolitical blog, worldwide airport networkにアルゴリズムを適用して可視化するところまでをjupyter notebookに書き、リンクをここに貼ろうと考えています。github上はjupyter notebookを図入りで表示してくれるので、興味も引きやすいかなと思います。 [絶対ある方がよい。例は多くてもよい。]
+- [Example 1 (Detection of core-periphery structure)](https://github.com/skojaku/core-periphery-detection/blob/add-notebook/notebooks/example1.ipynb)
+- [Example 2 (Statistical test)](https://github.com/skojaku/core-periphery-detection/blob/add-notebook/notebooks/example2.ipynb)
