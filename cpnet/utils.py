@@ -31,18 +31,28 @@ def to_nxgraph(net):
         return nx.from_numpy_array(net)
 
 
-def set_node_colors(G, c, x, cmap):
+def set_node_colors(G, c, x, cmap, max_num=None):
     # Count the number of groups
     num_groups = len(np.unique([d for d in c.values() if d is not None]))
 
+    if max_num is None:
+        max_num = num_groups
+
     # Set up the palette
     if cmap is None:
-        if num_groups <= 8:
+        if np.minimum(max_num, num_groups) <= 8:
             cmap = sns.color_palette().as_hex()
-        elif num_groups <= 20:
+        elif np.minimum(max_num, num_groups) <= 20:
             cmap = sns.color_palette("tab20").as_hex()
         else:
             cmap = sns.color_palette("hls", num_groups).as_hex()
+
+    # Calc size of groups
+    cids, freq = np.unique(np.array(list(c.values())), return_counts=True)
+    order = np.argsort(-freq)
+    rank = np.argsort(order)
+
+    cmap = [cmap[i] if i < max_num else "#4d4d4d" for i in rank]
 
     bounds = np.linspace(0, 1, 11)
     norm = mpl.colors.BoundaryNorm(bounds, ncolors=12, extend="both")
@@ -74,6 +84,7 @@ def draw(
     font_size=0,
     pos=None,
     cmap=None,
+    max_colored_group_num=None,
     draw_nodes_kwd={},
     draw_edges_kwd={"edge_color": "#adadad"},
     draw_labels_kwd={},
@@ -112,20 +123,28 @@ def draw(
         - value: tuple (x, y) indicating the location
     """
 
-    node_colors, node_edge_colors = set_node_colors(G, c, x, cmap)
+    node_colors, node_edge_colors = set_node_colors(
+        G, c, x, cmap, max_colored_group_num
+    )
 
     # Set the position of nodes
     if pos is None:
         pos = nx.spring_layout(G)
-    
+
     # Split node into residual and non-residual
     residuals = [d for d in G.nodes() if (c[d] is None) or (x[d] is None)]
     non_residuals = [d for d in G.nodes() if (c[d] is not None) and (x[d] is not None)]
 
-
     # Draw
     nodes = nx.draw_networkx_nodes(
-        G, pos, node_color=[ node_colors[i] for i, d in enumerate(G.nodes()) if x[d] is not None], nodelist=non_residuals, ax=ax, **draw_nodes_kwd
+        G,
+        pos,
+        node_color=[
+            node_colors[i] for i, d in enumerate(G.nodes()) if x[d] is not None
+        ],
+        nodelist=non_residuals,
+        ax=ax,
+        **draw_nodes_kwd
     )
     nodes.set_edgecolor(node_edge_colors)
     draw_nodes_kwd_residual = draw_nodes_kwd.copy()
@@ -150,6 +169,7 @@ def draw(
     ax.axis("off")
 
     return ax, pos
+
 
 def draw_interactive(G, c, x, hover_text=None, node_size=10.0, pos=None, cmap=None):
 

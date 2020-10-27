@@ -19,7 +19,7 @@ def sz_degree(network, c, x):
 def config_model(G):
     deg = [d[1] for d in G.degree()]
     return nx.expected_degree_graph(deg)
-    #return nx.configuration_model(deg)
+    # return nx.configuration_model(deg)
 
 
 def erdos_renyi(G):
@@ -30,7 +30,7 @@ def erdos_renyi(G):
 
 def sampling(G, cpa, sfunc, null_model):
     Gr = null_model(G)
-    #Gr.remove_edges_from(nx.selfloop_edges(Gr))
+    # Gr.remove_edges_from(nx.selfloop_edges(Gr))
     Ar = sparse.csr_matrix(nx.adjacency_matrix(Gr))
     cpa.detect(Ar)
     q_rand = cpa.qs_
@@ -160,7 +160,7 @@ def qstest(
     s_ave = np.mean(s_tilde)
     q_std = np.std(q_tilde, ddof=1)
     s_std = np.std(s_tilde, ddof=1)
-   
+
     if (s_std <= 1e-30) or (q_std <= 1e-30):
         gamma = 0.0
         s_std = 1e-20
@@ -176,7 +176,8 @@ def qstest(
     for cid in range(C):
         if (s_std <= 1e-30) or (q_std <= 1e-30):
             continue
-        w = np.exp(-((s[cid] - s_tilde) / (np.sqrt(2.0) * h * s_std)) ** 2)
+        logw = -(((s[cid] - s_tilde) / (np.sqrt(2.0) * h * s_std)) ** 2)
+        # w = np.exp(-((s[cid] - s_tilde) / (np.sqrt(2.0) * h * s_std)) ** 2)
         cd = norm.cdf(
             (
                 (q[cid] - q_tilde) / (h * q_std)
@@ -184,7 +185,10 @@ def qstest(
             )
             / np.sqrt(1.0 - gamma * gamma)
         )
-        denom = sum(w)
+        ave_logw = np.mean(logw)
+        denom = sum(np.exp(logw - ave_logw))
+        logw = logw - ave_logw
+        w = np.exp(logw)
         if denom <= 1e-30:
             continue
         p_values[cid] = 1.0 - (sum(w * cd) / denom)
