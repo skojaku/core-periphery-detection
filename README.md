@@ -56,7 +56,7 @@ G = nx.karate_club_graph()
 algorithm.detect(G)
 ```
 
-Retrieve the results
+Retrieve the results:
 
 ```python
 c = algorithm.get_pair_id()
@@ -70,11 +70,11 @@ x = algorithm.get_coreness()
 For example,
  
 ```python
-c = {A: 0, B: 1, C: 0, D: 2 ...} 
-x = {A: 1, B: 1, C: 0, D: 1 ...}
+c = {A: 0, B: 1, C: 0, ...} 
+x = {A: 1, B: 1, C: 0, ...}
 ```
 
-means that nodes A and C belong to group 1, A is a core node, and C is a peripheral node of the group A belongs to.
+means that nodes A and C belong to group 0, and B belongs to a different group 1. Furtheremore, A and B are core nodes, and C is a peripheral node.
 
 All algorithms implemented in this package have the same inferface. This means that you can use other algorithms by changing `cpnet.KM_config` to, for example, `cpnet.BE`. See the list of algorithms as follows:
 
@@ -102,9 +102,10 @@ One can detect
 
 ## Statistical test
 
-The core-periphery structure detected by any algorithm may be dubious. For example, an algorithm labels nodes as core or periphery even if the network is a regular random graph, which is supposed not to have core-periphery structure. 
+The core-periphery structure detected by any algorithm can be systematic artifacts; even for networks without core-periphery structure such as regular graphs and random graphs, an algorithm labels nodes as core or periphery. 
 
-It is crucial to inspect whether the detected core-periphery structure is significant, which is why the statistical test comes in. This package has an implementation of a statistical test, *q-s test*, in which one runs the algorithm used to detect the core-periphery structure in question to many randomized networks. If randomized networks do not yield a core-periphery structure stronger than that detected for the input network, the core-periphery structure detected for the input network is considered as significant. See papers [here](https://www.nature.com/articles/s41598-018-25560-z) and [here](https://iopscience.iop.org/article/10.1088/1367-2630/aab547) for the method.
+To filter out spurious core-periphery structure, this package provides an implementation of a statistical test, *q-s test*.
+In this test, one generate many randomized networks and detect core-periphery structure with the algorithm used to detect the core-periphery structure in question.  The core-periphery structure detected for the input network is considered as significant if it is stronger than those detected in randomized networks. See papers [here](https://www.nature.com/articles/s41598-018-25560-z) and [here](https://iopscience.iop.org/article/10.1088/1367-2630/aab547) for the method.
 
 To carry out the statistical test, run 
 
@@ -171,8 +172,5 @@ fig = cpnet.draw_interactive(G, c, x, hover_text)
 The drawing functions are demonstrated in the example notebook. See 
 
 # Examples
-増田さんへ
-ここに2つか3つくらい例を載せようと思います。最初に使い方の手順を簡単に書きましたが、実際にどう使うのかを説明するために実践例が必要かなと思い、この提案をしています。
-例はpolitical blog, worldwide airport networkにアルゴリズムを適用して可視化するところまでをjupyter notebookに書き、リンクをここに貼ろうと考えています。github上はjupyter notebookを図入りで表示してくれるので、興味も引きやすいかなと思います。 [絶対ある方がよい。例は多くてもよい。]
 - [Example 1 (Detection of core-periphery structure)](https://github.com/skojaku/core-periphery-detection/blob/add-notebook/notebooks/example1.ipynb)
 - [Example 2 (Statistical test)](https://github.com/skojaku/core-periphery-detection/blob/add-notebook/notebooks/example2.ipynb)
