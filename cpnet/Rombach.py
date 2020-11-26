@@ -107,7 +107,7 @@ class Rombach(CPAlgorithm):
 
         self.nodelabel = nodelabel
         self.c_ = np.zeros(x.size).astype(int)
-        self.x_ = x.astype(int)
+        self.x_ = x
         self.Q_ = qbest
         self.qs_ = [qbest]
 
