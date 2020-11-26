@@ -172,5 +172,5 @@ fig = cpnet.draw_interactive(G, c, x, hover_text)
 The drawing functions are demonstrated in the example notebook. See 
 
 # Examples
-- [Example 1 (Detection of core-periphery structure)](https://github.com/skojaku/core-periphery-detection/blob/add-notebook/notebooks/example1.ipynb)
-- [Example 2 (Statistical test)](https://github.com/skojaku/core-periphery-detection/blob/add-notebook/notebooks/example2.ipynb)
+- [Example 1 (Detection of core-periphery structure)](notebooks/example1.ipynb)
+- [Example 2 (Statistical test)](https://github.com/skojaku/core-periphery-detection/blob/notebooks/example2.ipynb)
