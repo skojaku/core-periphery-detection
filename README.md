@@ -174,3 +174,5 @@ The drawing functions are demonstrated in the example notebook. See
 # Examples
 - [Example 1 (Detection of core-periphery structure)](notebooks/example1.ipynb)
 - [Example 2 (Statistical test)](notebooks/example2.ipynb)
+- [Example 3 (Case study: Pilitical blog network)](notebooks/example3.ipynb)
+- [Example 4 (Case study: Airport network)](notebooks/example4.ipynb)
