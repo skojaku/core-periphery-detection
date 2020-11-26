@@ -33,7 +33,9 @@ def to_nxgraph(net):
 
 def set_node_colors(G, c, x, cmap, max_num=None):
     # Count the number of groups
-    num_groups = len(np.unique([d for d in c.values() if d is not None]))
+    cvals = np.array(list(c.values()))
+    cids = np.array(list(set(cvals).difference(set([None]))))
+    num_groups = len(cids) 
 
     if max_num is None:
         max_num = num_groups
@@ -48,30 +50,27 @@ def set_node_colors(G, c, x, cmap, max_num=None):
             cmap = sns.color_palette("hls", num_groups).as_hex()
 
     # Calc size of groups
-    cids, freq = np.unique(np.array(list(c.values())), return_counts=True)
-    order = np.argsort(-freq)
-    rank = np.argsort(order)
-
-    cmap = [cmap[i] if i < max_num else "#4d4d4d" for i in rank]
+    freq = np.array([np.sum(cid == cvals) for cid in cids])
+    cmap = dict(zip(cids[np.argsort(-freq)], [cmap[i] for i in range(max_num)]))
 
     bounds = np.linspace(0, 1, 11)
     norm = mpl.colors.BoundaryNorm(bounds, ncolors=12, extend="both")
-
+    
     # Calculate the color for each node using the palette
-    cmap_coreness = [sns.light_palette(color, n_colors=12).as_hex() for color in cmap]
-    cmap_coreness_dark = [
-        sns.dark_palette(color, n_colors=12).as_hex() for color in cmap
-    ]
-    node_colors = [
-        cmap_coreness[c[d]][norm(x[d]) - 1] if x[d] is not None else "#4d4d4d"
+    cmap_coreness = {k:sns.light_palette(v, n_colors=12).as_hex() for k, v in cmap.items()}
+    cmap_coreness_dark = {
+        k:sns.dark_palette(v, n_colors=12).as_hex() for k, v in cmap.items()
+    }
+    node_colors = {
+        d:(cmap_coreness[c[d]][norm(x[d]) - 1] if (x[d] is not None and c[d] in cmap_coreness) else "#4d4d4d")
         for i, d in enumerate(G.nodes())
-    ]
-    node_edge_colors = []
+    }
+    node_edge_colors = {}
     for i, d in enumerate(G.nodes()):
-        if x[d] is None:
-            node_edge_colors += ["#4d4d4d"]
+        if (x[d] is None) or (c[d] not in cmap_coreness):
+            node_edge_colors[d]= "#4d4d4d"
         else:
-            node_edge_colors += [cmap_coreness_dark[c[d]][-norm(x[d])]]
+            node_edge_colors[d]= cmap_coreness_dark[c[d]][-norm(x[d])]
     return node_colors, node_edge_colors
 
 
@@ -134,19 +133,21 @@ def draw(
     # Split node into residual and non-residual
     residuals = [d for d in G.nodes() if (c[d] is None) or (x[d] is None)]
     non_residuals = [d for d in G.nodes() if (c[d] is not None) and (x[d] is not None)]
-
+    
     # Draw
     nodes = nx.draw_networkx_nodes(
         G,
         pos,
         node_color=[
-            node_colors[i] for i, d in enumerate(G.nodes()) if x[d] is not None
+            node_colors[d] for i, d in enumerate(G.nodes()) if x[d] is not None
         ],
         nodelist=non_residuals,
         ax=ax,
         **draw_nodes_kwd
     )
-    nodes.set_edgecolor(node_edge_colors)
+    if nodes is not None:
+        nodes.set_edgecolor([node_edge_colors[r] for r in non_residuals])
+
     draw_nodes_kwd_residual = draw_nodes_kwd.copy()
     draw_nodes_kwd_residual["node_size"] = 0.1 * draw_nodes_kwd.get("node_size", 100)
     nodes = nx.draw_networkx_nodes(
@@ -158,7 +159,8 @@ def draw(
         ax=ax,
         **draw_nodes_kwd_residual
     )
-    nodes.set_edgecolor("#4d4d4d")
+    if nodes is not None: 
+        nodes.set_edgecolor("#4d4d4d")
 
     if draw_edge:
         nx.draw_networkx_edges(G, pos, ax=ax, **draw_edges_kwd)
