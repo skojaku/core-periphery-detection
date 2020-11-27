@@ -205,9 +205,9 @@ def _score_(A_indptr, A_indices, A_data, _c, _x, num_nodes):
     )
     Q = Q / np.maximum(1, (num_nodes * (num_nodes - 1) / 2))
 
-    #if Q > 1:
+    # if Q > 1:
     #    Q = 1
-    #if Q < -1:
+    # if Q < -1:
     #    Q = -1
 
     return Q, [Q]
