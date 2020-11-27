@@ -5,6 +5,9 @@ import networkx as nx
 import pandas as pd
 import matplotlib as mpl
 import seaborn as sns
+from fa2 import ForceAtlas2
+from collections import Counter
+from collections import defaultdict
 import plotly.graph_objects as go
 
 
@@ -31,47 +34,95 @@ def to_nxgraph(net):
         return nx.from_numpy_array(net)
 
 
-def set_node_colors(G, c, x, cmap, max_num=None):
-    # Count the number of groups
-    cvals = np.array(list(c.values()))
-    cids = np.array(list(set(cvals).difference(set([None]))))
-    num_groups = len(cids) 
+def set_node_colors(c, x, cmap, colored_nodes):
 
-    if max_num is None:
-        max_num = num_groups
+    node_colors = defaultdict(lambda x: "#8d8d8d")
+    node_edge_colors = defaultdict(lambda x: "#4d4d4d")
+
+    cnt = Counter([c[d] for d in colored_nodes])
+    num_groups = len(cnt)
 
     # Set up the palette
     if cmap is None:
-        if np.minimum(max_num, num_groups) <= 8:
+        if num_groups <= 10:
             cmap = sns.color_palette().as_hex()
-        elif np.minimum(max_num, num_groups) <= 20:
+        elif num_groups <= 20:
             cmap = sns.color_palette("tab20").as_hex()
         else:
             cmap = sns.color_palette("hls", num_groups).as_hex()
 
     # Calc size of groups
-    freq = np.array([np.sum(cid == cvals) for cid in cids])
-    cmap = dict(zip(cids[np.argsort(-freq)], [cmap[i] for i in range(max_num)]))
-
+    cmap = dict(
+        zip(
+            [d[0] for d in cnt.most_common(num_groups)],
+            [cmap[i] for i in range(num_groups)],
+        )
+    )
     bounds = np.linspace(0, 1, 11)
     norm = mpl.colors.BoundaryNorm(bounds, ncolors=12, extend="both")
-    
+
     # Calculate the color for each node using the palette
-    cmap_coreness = {k:sns.light_palette(v, n_colors=12).as_hex() for k, v in cmap.items()}
+    cmap_coreness = {
+        k: sns.light_palette(v, n_colors=12).as_hex() for k, v in cmap.items()
+    }
     cmap_coreness_dark = {
-        k:sns.dark_palette(v, n_colors=12).as_hex() for k, v in cmap.items()
+        k: sns.dark_palette(v, n_colors=12).as_hex() for k, v in cmap.items()
     }
-    node_colors = {
-        d:(cmap_coreness[c[d]][norm(x[d]) - 1] if (x[d] is not None and c[d] in cmap_coreness) else "#4d4d4d")
-        for i, d in enumerate(G.nodes())
-    }
-    node_edge_colors = {}
-    for i, d in enumerate(G.nodes()):
-        if (x[d] is None) or (c[d] not in cmap_coreness):
-            node_edge_colors[d]= "#4d4d4d"
-        else:
-            node_edge_colors[d]= cmap_coreness_dark[c[d]][-norm(x[d])]
+
+    for d in colored_nodes:
+        node_colors[d] = cmap_coreness[c[d]][norm(x[d]) - 1]
+        node_edge_colors[d] = cmap_coreness_dark[c[d]][-norm(x[d])]
     return node_colors, node_edge_colors
+
+
+def classify_nodes(G, c, x, max_num=None):
+    non_residuals = [d for d in G.nodes() if (c[d] is not None) and (x[d] is not None)]
+    residuals = [d for d in G.nodes() if (c[d] is None) or (x[d] is None)]
+
+    # Count the number of groups
+    cnt = Counter([c[d] for d in non_residuals])
+    cvals = np.array([d[0] for d in cnt.most_common(len(cnt))])
+    num_groups = len(cvals)
+
+    if max_num is not None:
+        cvals = set(cvals[:max_num])
+    else:
+        cvals = set(cvals)
+
+    #
+    colored_nodes = [d for d in non_residuals if c[d] in cvals]
+    muted = [d for d in non_residuals if not c[d] in cvals]
+
+    # Bring core nodes to front
+    order = np.argsort([x[d] for d in colored_nodes])
+    colored_nodes = [colored_nodes[d] for d in order]
+
+    return colored_nodes, muted, residuals
+
+
+def calc_node_pos(G, iterations=300, **params):
+    default_params = dict(
+        # Behavior alternatives
+        outboundAttractionDistribution=False,  # Dissuade hubs
+        linLogMode=False,  # NOT IMPLEMENTED
+        adjustSizes=False,  # Prevent overlap (NOT IMPLEMENTED)
+        edgeWeightInfluence=1.0,
+        # Performance
+        jitterTolerance=1.0,  # Tolerance
+        barnesHutOptimize=True,
+        barnesHutTheta=1.2,
+        multiThreaded=False,  # NOT IMPLEMENTED
+        # Tuning
+        scalingRatio=2.0,
+        strongGravityMode=False,
+        gravity=1.0,
+        verbose=True,
+    )
+    if params is not None:
+        for k, v in params.items():
+            default_params[k] = v
+    forceatlas2 = ForceAtlas2(**default_params)
+    return forceatlas2.forceatlas2_networkx_layout(G, pos=None, iterations=iterations)
 
 
 def draw(
@@ -87,6 +138,7 @@ def draw(
     draw_nodes_kwd={},
     draw_edges_kwd={"edge_color": "#adadad"},
     draw_labels_kwd={},
+    layout_kwd={},
 ):
     """
     Plot the core-periphery structure in the networks
@@ -122,31 +174,44 @@ def draw(
         - value: tuple (x, y) indicating the location
     """
 
-    node_colors, node_edge_colors = set_node_colors(
-        G, c, x, cmap, max_colored_group_num
+    # Split node into residual and non-residual
+    colored_nodes, muted_nodes, residuals = classify_nodes(
+        G, c, x, max_colored_group_num
     )
+
+    node_colors, node_edge_colors = set_node_colors(c, x, cmap, colored_nodes)
 
     # Set the position of nodes
     if pos is None:
-        pos = nx.spring_layout(G)
+        pos = calc_node_pos(G, **layout_kwd)
 
-    # Split node into residual and non-residual
-    residuals = [d for d in G.nodes() if (c[d] is None) or (x[d] is None)]
-    non_residuals = [d for d in G.nodes() if (c[d] is not None) and (x[d] is not None)]
-    
     # Draw
     nodes = nx.draw_networkx_nodes(
         G,
         pos,
-        node_color=[
-            node_colors[d] for i, d in enumerate(G.nodes()) if x[d] is not None
-        ],
-        nodelist=non_residuals,
+        node_color=[node_colors[d] for d in colored_nodes],
+        nodelist=colored_nodes,
         ax=ax,
+        zorder=3,
         **draw_nodes_kwd
     )
     if nodes is not None:
-        nodes.set_edgecolor([node_edge_colors[r] for r in non_residuals])
+        nodes.set_edgecolor([node_edge_colors[r] for r in colored_nodes])
+
+    # Draw nodes that do not belong to the top max_colored_group_num core-periphery pairs
+    draw_nodes_kwd_muted_nodes = draw_nodes_kwd.copy()
+    draw_nodes_kwd_muted_nodes["node_size"] = 0.3 * draw_nodes_kwd.get("node_size", 100)
+    nodes = nx.draw_networkx_nodes(
+        G,
+        pos,
+        node_color="#8d8d8d",
+        nodelist=muted_nodes,
+        ax=ax,
+        zorder=2,
+        **draw_nodes_kwd_muted_nodes
+    )
+    if nodes is not None:
+        nodes.set_edgecolor("#8d8d8d")
 
     draw_nodes_kwd_residual = draw_nodes_kwd.copy()
     draw_nodes_kwd_residual["node_size"] = 0.1 * draw_nodes_kwd.get("node_size", 100)
@@ -157,9 +222,10 @@ def draw(
         nodelist=residuals,
         node_shape="s",
         ax=ax,
+        zorder=1,
         **draw_nodes_kwd_residual
     )
-    if nodes is not None: 
+    if nodes is not None:
         nodes.set_edgecolor("#4d4d4d")
 
     if draw_edge:
