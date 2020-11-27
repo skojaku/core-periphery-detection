@@ -100,7 +100,7 @@ class KM_config(CPAlgorithm):
 
 
 @numba.jit(nopython=True, cache=True)
-def _label_switching_(A_indptr, A_indices, A_data, num_nodes, alpha=0.5, itnum_max=50):
+def _label_switching_(A_indptr, A_indices, A_data, num_nodes, alpha=0.5, itnum_max=200):
 
     x = np.ones(num_nodes)
     deg = np.zeros(num_nodes)

@@ -30,6 +30,7 @@ def erdos_renyi(G):
 
 def sampling(G, cpa, sfunc, null_model):
     Gr = null_model(G)
+    # Gr.remove_edges_from(nx.selfloop_edges(Gr))
     Ar = sparse.csr_matrix(nx.adjacency_matrix(Gr))
     cpa.detect(Ar)
     q_rand = cpa.qs_
@@ -46,7 +47,7 @@ def qstest(
     null_model=config_model,
     sfunc=sz_n,
     num_of_thread=4,
-    num_of_rand_net=500,
+    num_of_rand_net=300,
     q_tilde=[],
     s_tilde=[],
 ):
@@ -175,7 +176,8 @@ def qstest(
     for cid in range(C):
         if (s_std <= 1e-30) or (q_std <= 1e-30):
             continue
-        w = np.exp(-(((s[cid] - s_tilde) / (np.sqrt(2.0) * h * s_std)) ** 2))
+        logw = -(((s[cid] - s_tilde) / (np.sqrt(2.0) * h * s_std)) ** 2)
+        # w = np.exp(-((s[cid] - s_tilde) / (np.sqrt(2.0) * h * s_std)) ** 2)
         cd = norm.cdf(
             (
                 (q[cid] - q_tilde) / (h * q_std)
@@ -183,7 +185,10 @@ def qstest(
             )
             / np.sqrt(1.0 - gamma * gamma)
         )
-        denom = sum(w)
+        ave_logw = np.mean(logw)
+        denom = sum(np.exp(logw - ave_logw))
+        logw = logw - ave_logw
+        w = np.exp(logw)
         if denom <= 1e-30:
             continue
         p_values[cid] = 1.0 - (sum(w * cd) / denom)

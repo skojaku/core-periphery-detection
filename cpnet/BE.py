@@ -83,7 +83,6 @@ class BE(CPAlgorithm):
         )
         res = max(res, key=lambda x: x["q"])
         cids, x, Q = res["cids"], res["x"], res["q"]
-
         self.nodelabel = nodelabel
         self.c_ = cids.astype(int)
         self.x_ = x.astype(int)
@@ -206,9 +205,9 @@ def _score_(A_indptr, A_indices, A_data, _c, _x, num_nodes):
     )
     Q = Q / np.maximum(1, (num_nodes * (num_nodes - 1) / 2))
 
-    if Q > 1:
-        Q = 1
-    if Q < -1:
-        Q = -1
+    #if Q > 1:
+    #    Q = 1
+    #if Q < -1:
+    #    Q = -1
 
     return Q, [Q]
