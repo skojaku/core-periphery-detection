@@ -1,4 +1,5 @@
 import numba
+import numpy as np
 
 from . import utils
 from .CPAlgorithm import CPAlgorithm
