@@ -3,6 +3,10 @@
 This package contains algorithms for detecting core-periphery structure in networks. 
 All algorithms are implemented in Python, with speed accelerations by numba, and can be used with a small coding effort.   
 
+### APIs
+
+See [documentation]()
+
 
 # Installation
 
@@ -22,13 +26,9 @@ For pip,
 pip install cpnet
 ```
 
-# Dependency:
+### Dependency:
 
 See requirements.txt
-
-# APIs
-
-See [documentation]()
 
 # Usage
 
