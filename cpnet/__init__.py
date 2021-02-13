@@ -12,7 +12,7 @@ from .Cucuringu import *
 from .Divisive import *
 from .KM_config import *
 from .KM_ER import *
-from .LIP import *
+from .Lip import *
 from .qstest import *
 from .Rombach import *
 from .Rossa import *
