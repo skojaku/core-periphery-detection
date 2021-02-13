@@ -16,7 +16,7 @@ setup(
     packages=find_packages(exclude=["contrib", "docs", "tests"]),
     install_requires=[
         "networkx>=2.0",
-        "numpy>=1.16.0",
+        "numpy>=1.16.5",
         "simanneal>=0.4.2",
         "scipy>=1.5.2",
         "numba>=0.50.0",

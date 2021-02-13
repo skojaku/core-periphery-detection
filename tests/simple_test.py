@@ -8,6 +8,9 @@ from scipy import sparse
 
 import cpnet
 
+numba_logger = logging.getLogger("numba")
+numba_logger.setLevel(logging.WARNING)
+
 logger = logging.getLogger()
 logger.level = logging.DEBUG
 
