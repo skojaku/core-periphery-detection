@@ -1,14 +1,14 @@
-import numpy as np
-from scipy import sparse
-import numba
-import networkx as nx
-import pandas as pd
+from collections import Counter, defaultdict
+
 import matplotlib as mpl
+import networkx as nx
+import numba
+import numpy as np
+import pandas as pd
+import plotly.graph_objects as go
 import seaborn as sns
 from fa2 import ForceAtlas2
-from collections import Counter
-from collections import defaultdict
-import plotly.graph_objects as go
+from scipy import sparse
 
 
 def to_adjacency_matrix(net):
@@ -82,7 +82,6 @@ def classify_nodes(G, c, x, max_num=None):
     # Count the number of groups
     cnt = Counter([c[d] for d in non_residuals])
     cvals = np.array([d[0] for d in cnt.most_common(len(cnt))])
-    num_groups = len(cvals)
 
     if max_num is not None:
         cvals = set(cvals[:max_num])
@@ -140,38 +139,36 @@ def draw(
     draw_labels_kwd={},
     layout_kwd={},
 ):
-    """
-    Plot the core-periphery structure in the networks
+    """Plot the core-periphery structure in the networks.
 
-    Params
-    ------
-    G: networkx.Graph
-    c: dict
-        - key: node id given by G.noes()
-        - value: integer indicating the group id
-    x: dict
-        - key: node id given by G.noes()
-        - value: float indicating the coreness
-    ax: matplotlib.axis
-    font_size: int
-        Font size for node labels. Set 0 to hide the font.
-    pos: dict
-        - key: node id given by G.nodes()
-        - value: tuple (x, y) indicating the location
-    cmap: colormap
-    draw_nodes_kwd: dict
-        Parameter for networkx.draw_networkx_nodes
-    draw_edges_kwd: dict
-        Parameter for networkx.draw_networkx_edges
-    draw_labels_kwd: dict
-        Parameter for networkx.draw_networkx_labels
-
-    Returns
-    ------
-    ax: matplotlib.axes
-    pos: dict
-        - key: node id given by G.noes()
-        - value: tuple (x, y) indicating the location
+    :param G: Graph
+    :type G:  networkx.Graph
+    :param c: dict
+    :type c: group membership c[i] of i
+    :param x: core (x[i])=1 or periphery (x[i]=0)
+    :type x: dict
+    :param ax: axis
+    :type ax: matplotlib.pyplot.ax
+    :param draw_edge: whether to draw edges, defaults to True
+    :type draw_edge: bool, optional
+    :param font_size: font size for node labels, defaults to 0
+    :type font_size: int, optional
+    :param pos: pos[i] is the xy coordinate of node i, defaults to None
+    :type pos: dict, optional
+    :param cmap: colomap defaults to None
+    :type cmap: matplotlib.cmap, optional
+    :param max_colored_group_num: Number of groups to color, defaults to None
+    :type max_colored_group_num: int, optional
+    :param draw_nodes_kwd: Parameter for networkx.draw_networkx_nodes, defaults to {}
+    :type draw_nodes_kwd: dict, optional
+    :param draw_edges_kwd: Parameter for networkx.draw_networkx_edges, defaults to {"edge_color": "#adadad"}
+    :type draw_edges_kwd: dict, optional
+    :param draw_labels_kwd: Parameter for networkx.draw_networkx_labels, defaults to {}
+    :type draw_labels_kwd: dict, optional
+    :param layout_kwd: layout keywords, defaults to {}
+    :type layout_kwd: dict, optional
+    :return: (ax, pos)
+    :rtype: matplotlib.pyplot.ax, dict
     """
 
     # Split node into residual and non-residual
