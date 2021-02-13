@@ -1,69 +1,48 @@
-import scipy as sp
-import numpy as np
-from .CPAlgorithm import *
-from . import utils
 import numba
+import numpy as np
+import scipy as sp
+
+from . import utils
+from .CPAlgorithm import CPAlgorithm
 
 
 class Surprise(CPAlgorithm):
-    """ Core-periphery detection by Surprise
+    """Core-periphery detection by Surprise.
 
-    Parameters
-    ----------
-    num_runs : int
-           Number of runs of the algorithm (optional, default: 1)
-           Run the algorithm num_runs times. Then, this algorithm outputs the result yielding the maximum quality.
+    J. van Lidth de Jeude, G. Caldarelli, T. Squartini. Detecting Core-Periphery Structures by Surprise. EPL, 125, 2019
 
-    Examples
-    --------
-    Create this object.
+    .. highlight:: python
+    .. code-block:: python
 
-    >>> import cpnet
-    >>> spr = cpnet.Surprise()
-
-    **Core-periphery detection**
-
-    Detect core-periphery structure in network G (i.e., NetworkX object):
-
-    >>> spr.detect(G)
-
-    Retrieve the ids of the core-periphery pair to which each node belongs:
-
-    >>> pair_id = spr.get_pair_id()
-
-    Retrieve the coreness:
-
-    >>> coreness = spr.get_coreness()
+        >>> import cpnet
+        >>> alg = cpnet.Surprise()
+        >>> alg.detect(G)
+        >>> pair_id = alg.get_pair_id()
+        >>> coreness = alg.get_coreness()
 
     .. note::
 
-       The implemented algorithm accepts unweighted and undirected networks only.
-       The algorithm finds a single CP pair in the given network, i.e., c[node_name] =0 for all node_name.
-       This algorithm is stochastic, i.e., one would obtain different results at each run.
-
-    .. rubric:: Reference
-
-    [1] J. van Lidth de Jeude, G. Caldarelli, T. Squartini. Detecting Core-Periphery Structures by Surprise. EPL, 125, 2019
-
+        - [ ] weighted
+        - [ ] directed
+        - [ ] multiple groups of core-periphery pairs
+        - [ ] continuous core-periphery structure
     """
 
-    def __init__(self):
-        self.num_runs = 1
+    def __init__(self, num_runs=10):
+        """Initialize algorithm.
+
+        :param num_runs: number of runs, defaults to 10
+        :type num_runs: int, optional
+        """
+        self.num_runs = num_runs
 
     def detect(self, G):
-        """Detect a single core-periphery pair using the Borgatti-Everett algorithm.
+        """Detect core-periphery structure.
 
-        Parameters
-        ----------
-        G : NetworkX graph object
-
-        Examples
-        --------
-        >>> import networkx as nx
-        >>> import cpnet
-        >>> G = nx.karate_club_graph()  # load the karate club network.
-        >>> spr = cpnet.Surprise()
-        >>> spr.detect(G)
+        :param G: Graph
+        :type G: networkx.Graph or scipy sparse matrix
+        :return: None
+        :rtype: None
         """
 
         A, nodelabel = utils.to_adjacency_matrix(G)
@@ -71,7 +50,7 @@ class Surprise(CPAlgorithm):
         N = A.shape[0]
         xbest = np.zeros(N)
         qbest = 0
-        for it in range(self.num_runs):
+        for _it in range(self.num_runs):
             x, q = _detect_(A.indptr, A.indices, A.data, A.shape[0])
             if q < qbest:
                 xbest = x
@@ -79,11 +58,22 @@ class Surprise(CPAlgorithm):
 
         self.nodelabel = nodelabel
         self.c_ = np.zeros(N).astype(int)
-        self.x_ = x.astype(int)
+        self.x_ = xbest.astype(int)
         self.Q_ = qbest
         self.qs_ = [qbest]
 
     def _score(self, A, c, x):
+        """Calculate the strength of core-periphery pairs.
+
+        :param A: Adjacency amtrix
+        :type A: scipy sparse matrix
+        :param c: group to which a node belongs
+        :type c: dict
+        :param x: core (x=1) or periphery (x=0)
+        :type x: dict
+        :return: strength of core-periphery
+        :rtype: float
+        """
         num_nodes = A.shape[0]
         qs = _score_(A.indptr, A.indices, A.data, num_nodes, x)
         return [qs]
@@ -129,11 +119,10 @@ def _detect_(A_indptr, A_indices, A_data, N):
 
     q = _calculateSurprise_(A_indptr, A_indices, A_data, N, x)
 
-    for itnum in range(5):
+    for _itnum in range(5):
         for ind in range(edge_num):
             edge_id = edge_order[ind]
             u = int(edge_list[edge_id, 0])
-            v = int(edge_list[edge_id, 1])
             # Move node u to the other group and
             # compute the changes in the number of edges of different types
             newx = 1 - x[u]
