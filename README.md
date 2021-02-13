@@ -3,9 +3,15 @@
 This package contains algorithms for detecting core-periphery structure in networks. 
 All algorithms are implemented in Python, with speed accelerations by numba, and can be used with a small coding effort.   
 
-### APIs
-
-See [documentation]()
+# Contents
+- [Installation](#installation)
+- [Usage](#usage)
+    - [Detection of core-periphery structure](#detection-of-core\-periphery-structure)
+    - [Statistical test](#statistical-test)
+    - [Use a different null model](#use-a-different-null-model)
+- [Examples](#examples)
+- [Available Algorithms](#available-algorithms)
+- [Documentations]()
 
 
 # Installation
@@ -73,29 +79,8 @@ x = {A: 1, B: 1, C: 0, ...}
 
 means that nodes A and C belong to group 0, and B belongs to a different group 1. Furtheremore, A and B are core nodes, and C is a peripheral node.
 
-All algorithms implemented in this package have the same inferface. This means that you can use other algorithms by changing `cpnet.KM_config` to, for example, `cpnet.BE`. See the list of algorithms as follows:
+All algorithms implemented in this package have the same inferface. This means that you can use other algorithms by changing `cpnet.KM_config` to, for example, `cpnet.BE`. See [the list of algorithms](#available-algorithms).
 
-| Algorithm | Reference |
-|-----------|-----------|
-| [cpnet.BE](cpnet/BE.py) | [S. P. Borgatti and M. G. Everett. Models of core/periphery structures. Social Networks, 21, 375–395, 2000](https://www.sciencedirect.com/science/article/abs/pii/S0378873399000192)|
-| [cpnet.Lip](cpnet/Lip.py)  | [S. Z. W. Lip. A fast algorithm for the discrete core/periphery bipartitioning problem. Preprint arXiv: 1102.5511, 2011](https://arxiv.org/abs/1102.5511) |
-| [cpnet.LowRankCore](cpnet/Cucuringu.py) <br> [cpnet.LapCore](cpnet/Cucuringu.py) <br> [cpnet.LapSgnCore](cpnet/Cucuringu.py) | [M. Cucuringu, P. Rombach, S. H. Lee, and M. A. Porter. Detection of core-periphery structure in networks using spectral methods and geodesic paths. European Journal of Applied Mathematics, 846–887, 2016](https://www.cambridge.org/core/journals/european-journal-of-applied-mathematics/article/detection-of-coreperiphery-structure-in-networks-using-spectral-methods-and-geodesic-paths/A08BE0DA1A8AD7C58C24AF53AA134729)|
-| [cpnet.Rombach](cpnet/Rombach.py)  | [P. Rombach, M. A. Porter, J. H. Fowler, and P. J. Mucha. Core-Periphery Structure in Networks (Revisited). SIAM Review, 59, 619–646, 2017](https://epubs.siam.org/doi/10.1137/17M1130046) |
-| [cpnet.Rossa](cpnet/Rossa.py)  | [F. Rossa, F. Dercole, and C. Piccardi. Profiling core-periphery network structure by random walkers. Scientific Reports, 3, 1467, 2013](https://www.nature.com/articles/srep01467) |
-| [cpnet.Surprise](cpnet/Surprise.py) | [J. van Lidth de Jeude, G. Caldarelli, T. Squartini. Detecting Core-Periphery Structures by Surprise. EPL, 125, 2019](https://epljournal.edpsciences.org/articles/epl/abs/2019/06/epl19592/epl19592.html) |
-| [cpnet.KM_ER](cpnet/KM_ER.py) | [S. Kojaku and N. Masuda. Finding multiple core-periphery pairs in networks. Physical Review E, 96, 052313, 2017](https://journals.aps.org/pre/abstract/10.1103/PhysRevE.96.052313) |
-| [cpnet.KM_config](cpnet/KM_config.py) <br> [cpnet.Divisive](cpnet/Divisive.py) | [S. Kojaku and N. Masuda. Core-periphery structure requires something else in networks. New Journal of Physics, 20, 043012, 2018](https://iopscience.iop.org/article/10.1088/1367-2630/aab547)|
-
-Some algorithms have tuning parameters. Please see the source code for the parameters specific to each algorithm. 
-
-One can detect
-
-- a single pair of a core and a periphery using
-  - `cpnet.BE`, `cpnet.Lip`, `cpnet.LapCore`, `cpnet.LapSgnCore`, `cpnet.Surprise`
-- multiple pairs of a core and a periphery using
-  - `cpnet.KM_ER`, `cpnet.KM_config`, `cpnet.Divisive`
-- a continuous spectrum between a core and a periphery using
-  - `cpnet.Rombach`, `cpnet.Rossa` 
 
 ## Statistical test
 
@@ -165,7 +150,6 @@ fig = cpnet.draw_interactive(G, c, x, hover_text)
 - `hover_text` is a dict object (optional), where the key is the node id given by G.nodes() and the value is the text to show in the toolbox.
 
 
-
 The drawing functions are demonstrated in the example notebook. See 
 
 # Examples
@@ -173,3 +157,28 @@ The drawing functions are demonstrated in the example notebook. See
 - [Example 2 (Statistical test)](notebooks/example2.ipynb)
 - [Example 3 (Case study: Pilitical blog network)](notebooks/example3.ipynb)
 - [Example 4 (Case study: Airport network)](notebooks/example4.ipynb)
+
+
+# Available algorithms
+
+| Algorithm | Reference |
+|-----------|-----------|
+| [cpnet.BE](cpnet/BE.py) | [S. P. Borgatti and M. G. Everett. Models of core/periphery structures. Social Networks, 21, 375–395, 2000](https://www.sciencedirect.com/science/article/abs/pii/S0378873399000192)|
+| [cpnet.Lip](cpnet/Lip.py)  | [S. Z. W. Lip. A fast algorithm for the discrete core/periphery bipartitioning problem. Preprint arXiv: 1102.5511, 2011](https://arxiv.org/abs/1102.5511) |
+| [cpnet.LowRankCore](cpnet/Cucuringu.py) <br> [cpnet.LapCore](cpnet/Cucuringu.py) <br> [cpnet.LapSgnCore](cpnet/Cucuringu.py) | [M. Cucuringu, P. Rombach, S. H. Lee, and M. A. Porter. Detection of core-periphery structure in networks using spectral methods and geodesic paths. European Journal of Applied Mathematics, 846–887, 2016](https://www.cambridge.org/core/journals/european-journal-of-applied-mathematics/article/detection-of-coreperiphery-structure-in-networks-using-spectral-methods-and-geodesic-paths/A08BE0DA1A8AD7C58C24AF53AA134729)|
+| [cpnet.Rombach](cpnet/Rombach.py)  | [P. Rombach, M. A. Porter, J. H. Fowler, and P. J. Mucha. Core-Periphery Structure in Networks (Revisited). SIAM Review, 59, 619–646, 2017](https://epubs.siam.org/doi/10.1137/17M1130046) |
+| [cpnet.Rossa](cpnet/Rossa.py)  | [F. Rossa, F. Dercole, and C. Piccardi. Profiling core-periphery network structure by random walkers. Scientific Reports, 3, 1467, 2013](https://www.nature.com/articles/srep01467) |
+| [cpnet.Surprise](cpnet/Surprise.py) | [J. van Lidth de Jeude, G. Caldarelli, T. Squartini. Detecting Core-Periphery Structures by Surprise. EPL, 125, 2019](https://epljournal.edpsciences.org/articles/epl/abs/2019/06/epl19592/epl19592.html) |
+| [cpnet.KM_ER](cpnet/KM_ER.py) | [S. Kojaku and N. Masuda. Finding multiple core-periphery pairs in networks. Physical Review E, 96, 052313, 2017](https://journals.aps.org/pre/abstract/10.1103/PhysRevE.96.052313) |
+| [cpnet.KM_config](cpnet/KM_config.py) <br> [cpnet.Divisive](cpnet/Divisive.py) | [S. Kojaku and N. Masuda. Core-periphery structure requires something else in networks. New Journal of Physics, 20, 043012, 2018](https://iopscience.iop.org/article/10.1088/1367-2630/aab547)|
+
+Some algorithms have tuning parameters. Please see the source code for the parameters specific to each algorithm. 
+
+One can detect
+
+- a single pair of a core and a periphery using
+  - `cpnet.BE`, `cpnet.Lip`, `cpnet.LapCore`, `cpnet.LapSgnCore`, `cpnet.Surprise`
+- multiple pairs of a core and a periphery using
+  - `cpnet.KM_ER`, `cpnet.KM_config`, `cpnet.Divisive`
+- a continuous spectrum between a core and a periphery using
+  - `cpnet.Rombach`, `cpnet.Rossa` 
