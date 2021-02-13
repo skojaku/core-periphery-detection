@@ -12,7 +12,7 @@ All algorithms are implemented in Python, with speed accelerations by numba, and
     - [Use a different null model](#use-a-different-null-model)
 - [Examples](#examples)
 - [Available Algorithms](#available-algorithms)
-- `Documentations <https://core-periphery-detection.readthedocs.io/en/latest/index.html>`_
+- [Documentations](https://core-periphery-detection.readthedocs.io/en/latest/index.html)
 
 
 # Installation
