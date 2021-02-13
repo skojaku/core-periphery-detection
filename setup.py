@@ -1,5 +1,6 @@
-from setuptools import setup, find_packages
 import os
+
+from setuptools import find_packages, setup
 
 __version__ = "0.0.6"
 
@@ -24,7 +25,7 @@ setup(
         "seaborn>=0.11.0",
         "pandas>=1.1.0",
         "tqdm>=4.49.0",
-        "fa2"
+        "fa2",
     ],
     zip_safe=False,
     include_package_data=True,

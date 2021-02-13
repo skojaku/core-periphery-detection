@@ -1,6 +1,8 @@
 language: python
 python:
+  - "3.6"
   - "3.7"
+  - "3.8"
 
 before_install:
   - sudo apt-get install build-essential git
@@ -9,7 +11,6 @@ before_install:
 
 # command to install dependencies
 install:
-  - pip install -r requirements.txt
   - pip install .
 
 # command to run tests
