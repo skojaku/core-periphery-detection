@@ -81,7 +81,8 @@ class Rossa(CPAlgorithm):
 
         for _k in range(1, N):
 
-            denom = np.asscalar(np.max([1, np.max(ak * (ak + deg))]))
+            denom = np.maximum(1, np.max(ak * (ak + deg)))
+            # denom = np.asscalar(np.max([1, np.max(ak * (ak + deg))]))
             score = (2 * ak * (x.T * A) - bk * deg) / denom
 
             score[x.T > 0] = np.Infinity
@@ -89,7 +90,7 @@ class Rossa(CPAlgorithm):
             idx = self._argmin2(score)
             x[idx] = 1
             ak = ak + deg[idx]
-            bk = np.asscalar(np.dot(x.T * A, x)[0, 0])
+            bk = np.dot(x.T * A, x)[0, 0]
 
             alpha[idx] = bk / max(1, ak)
 

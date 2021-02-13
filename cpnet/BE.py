@@ -1,6 +1,8 @@
 import numba
+import numpy as np
 from joblib import Parallel, delayed
 
+from . import utils
 from .CPAlgorithm import CPAlgorithm
 
 

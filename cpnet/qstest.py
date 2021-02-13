@@ -94,8 +94,8 @@ def qstest(
     pair_id_a = np.array([pair_id[x] for x in nodelabels])
     coreness_a = np.array([coreness[x] for x in nodelabels])
 
-    q = np.array(cpa.score(G, pair_id, coreness), dtype=np.float)
-    s = np.array(sfunc(A, pair_id_a, coreness_a), dtype=np.float)
+    q = np.array(cpa.score(G, pair_id, coreness), dtype=float)
+    s = np.array(sfunc(A, pair_id_a, coreness_a), dtype=float)
     C = len(q)
     alpha_corrected = 1.0 - (1.0 - significance_level) ** (1.0 / float(C))
 
