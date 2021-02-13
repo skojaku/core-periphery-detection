@@ -1,7 +1,9 @@
-from abc import ABCMeta, abstractmethod
 import abc
+from abc import ABCMeta, abstractmethod
+
 import networkx as nx
 import numpy as np
+
 from . import utils
 
 
@@ -14,12 +16,12 @@ class CPAlgorithm(metaclass=ABCMeta):
 
     @abstractmethod
     def detect(self):
-        """ Private """
+        """Private."""
         pass
 
     @abstractmethod
     def _score(self, A, c, x):
-        """ Private """
+        """Private."""
         pass
 
     def pairing(self, labels, a):
@@ -32,7 +34,7 @@ class CPAlgorithm(metaclass=ABCMeta):
         return self.pairing(self.nodelabel, self.c_)
 
     def get_coreness(self):
-        """Get the coreness of each node"""
+        """Get the coreness of each node."""
         return self.pairing(self.nodelabel, self.x_)
 
     def score(self, G, c, x):
