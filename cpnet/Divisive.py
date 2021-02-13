@@ -27,7 +27,7 @@ class Divisive(CPAlgorithm):
 
     .. note::
 
-        - [ ] weighted
+        - [x] weighted
         - [ ] directed
         - [x] multiple groups of core-periphery pairs
         - [ ] continuous core-periphery structure
