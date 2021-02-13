@@ -1,71 +1,49 @@
-from .CPAlgorithm import *
 import numba
 from joblib import Parallel, delayed
+
+from .CPAlgorithm import CPAlgorithm
 
 
 class BE(CPAlgorithm):
     """Borgatti Everett algorithm.
 
-    An algorithm for finding single core-periphery pair in networks.
+    Algorithm for finding single core-periphery pair in networks.
 
-    Parameters
-    ----------
-    num_runs : int
-           Number of runs of the algorithm (optional, default: 10)
-           Run the algorithm num_runs times. Then, this algorithm outputs the result yielding the maximum quality.
+    S. P. Borgatti and M. G. Everett. Models of core/periphery structures. Social Networks, 21, 375–395, 2000
 
-    Examples
-    --------
-    Create this object.
+    .. highlight:: python
+    .. code-block:: python
 
-    >>> import cpnet
-    >>> be = cpnet.BE()
-
-    **Core-periphery detection**
-
-    Detect core-periphery structure in network G (i.e., NetworkX object):
-
-    >>> be.detect(G)
-
-    Retrieve the ids of the core-periphery pair to which each node belongs:
-
-    >>> pair_id = be.get_pair_id()
-
-    Retrieve the coreness:
-
-    >>> coreness = be.get_coreness()
+        >>> import cpnet
+        >>> be = cpnet.BE()
+        >>> be.detect(G)
+        >>> pair_id = be.get_pair_id()
+        >>> coreness = be.get_coreness()
 
     .. note::
 
-       This algorithm accepts unweighted and undirected networks only.
-       Also, the algorithm assigns all nodes into the same core-periphery pair by construction, i.e., c[node_name] =0 for all node_name.
-       This algorithm is stochastic, i.e., one would obtain different results at each run.
-
-    .. rubric:: Reference
-
-    [1] S. P. Borgatti and M. G. Everett. Models of core/periphery structures. Soc.~Netw., 21(4):375–395, 2000.
-
+        - [ ] weighted
+        - [ ] directed
+        - [ ] multiple groups of core-periphery pairs
+        - [ ] continuous core-periphery structure
     """
 
     def __init__(self, num_runs=10):
+        """Initialize algorithm.
+
+        :param num_runs: number of runs, defaults to 10
+        :type num_runs: int, optional
+        """
         self.num_runs = num_runs
         self.n_jobs = 1
 
     def detect(self, G):
-        """Detect a single core-periphery pair using the Borgatti-Everett algorithm.
+        """Detect core-periphery structure.
 
-        Parameters
-        ----------
-        G : NetworkX graph object
-
-        Examples
-        --------
-        >>> import networkx as nx
-        >>> import cpnet
-        >>> G = nx.karate_club_graph()  # load the karate club network.
-        >>> be = cpnet.BE()
-        >>> be.detect(G)
-
+        :param G: Graph
+        :type G: networkx.Graph or scipy sparse matrix
+        :return: None
+        :rtype: None
         """
 
         A, nodelabel = utils.to_adjacency_matrix(G)
@@ -90,6 +68,17 @@ class BE(CPAlgorithm):
         self.qs_ = [Q]
 
     def _score(self, A, c, x):
+        """Calculate the strength of core-periphery pairs.
+
+        :param A: Adjacency amtrix
+        :type A: scipy sparse matrix
+        :param c: group to which a node belongs
+        :type c: dict
+        :param x: core (x=1) or periphery (x=0)
+        :type x: dict
+        :return: strength of core-periphery
+        :rtype: float
+        """
         num_nodes = A.shape[0]
         Q, qs = _score_(A.indptr, A.indices, A.data, c, x, num_nodes)
         return qs
@@ -112,7 +101,7 @@ def _kernighan_lin_(A_indptr, A_indices, A_data, num_nodes):
     fixed = np.zeros(num_nodes)
     Dperi = np.zeros(num_nodes)
 
-    for j in range(num_nodes):
+    for _j in range(num_nodes):
 
         fixed *= 0
         Nperi = 0
@@ -121,7 +110,7 @@ def _kernighan_lin_(A_indptr, A_indices, A_data, num_nodes):
             Nperi += 1 - x[i]
             Dperi[i] = 0
             neighbors = A_indices[A_indptr[i] : A_indptr[i + 1]]
-            for k, neighbor in enumerate(neighbors):
+            for _k, neighbor in enumerate(neighbors):
                 Dperi[i] += 1 - x[neighbor]
                 numer += x[i] + x[neighbor] - x[i] * x[neighbor]
         numer = numer / 2.0 - p * (
@@ -160,7 +149,7 @@ def _kernighan_lin_(A_indptr, A_indices, A_data, num_nodes):
             numer = numertmp
             Nperi += 2 * xt[nid] - 1
             neighbors = A_indices[A_indptr[i] : A_indptr[i + 1]]
-            for k, neik in enumerate(neighbors):
+            for _k, neik in enumerate(neighbors):
                 Dperi[neik] += 2 * xt[nid] - 1
             xt[nid] = 1 - xt[nid]
             dQ = dQ + qmax - Qold
@@ -190,7 +179,7 @@ def _score_(A_indptr, A_indices, A_data, _c, _x, num_nodes):
         nc += _x[i]
 
         neighbors = A_indices[A_indptr[i] : A_indptr[i + 1]]
-        for k, j in enumerate(neighbors):
+        for _k, j in enumerate(neighbors):
             mcc += _x[i] + _x[j] - _x[i] * _x[j]
             M += 1
 
@@ -204,10 +193,5 @@ def _score_(A_indptr, A_indices, A_data, _c, _x, num_nodes):
         1e-20, (np.sqrt(pa * (1 - pa)) * np.sqrt(pb * (1 - pb)))
     )
     Q = Q / np.maximum(1, (num_nodes * (num_nodes - 1) / 2))
-
-    # if Q > 1:
-    #    Q = 1
-    # if Q < -1:
-    #    Q = -1
 
     return Q, [Q]

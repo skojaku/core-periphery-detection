@@ -1,74 +1,50 @@
+import numba
+import numpy as np
 from scipy.sparse import diags
 from scipy.sparse.linalg import eigs
-from .CPAlgorithm import *
+
 from . import utils
-import numba
+from .CPAlgorithm import CPAlgorithm
 
 
 class LowRankCore(CPAlgorithm):
     """LowRankCore algorithm.
 
-    LowRankCore algorithm introduced in Ref.~ [1]
+    LowRankCore algorithm
 
-    Parameters
-    ----------
-    beta : float
-        Minimum fraction of core or peripheral nodes.
-        This parameter ensures :math:`\\beta \\leq \\frac{Nc}{N_c + N_p}, \\frac{Np}{N_c + N_p}`, where
-        :math:`N_c` and  :math:`N_p` are the number of core and peripheral nodes, respectively.  (optional, default: 0.1)
+    M. Cucuringu, P. Rombach, S. H. Lee, and M. A. Porter Detection of core-periphery structure in networks using spectral methods and geodesic paths. Euro. J. Appl. Math., 27:846–887, 2016.
 
-    Examples
-    --------
-    Create this object.
+    .. highlight:: python
+    .. code-block:: python
 
     >>> import cpnet
     >>> lrc = cpnet.LowRankCore()
-
-    **Core-periphery detection**
-
-    Detect core-periphery structure in network G (i.e., NetworkX object):
-
     >>> lrc.detect(G)
-
-    Retrieve the ids of the core-periphery pair to which each node belongs:
-
     >>> pair_id = lrc.get_pair_id()
-
-    Retrieve the coreness:
-
     >>> coreness = lrc.get_coreness()
 
     .. note::
 
-       This algorithm can accept unweighted and weighted networks.
-       The algorithm assigns all nodes into the same core-periphery pair by construction, i.e., c[node_name] =0 for all node_name.
-
-    .. rubric:: Reference
-
-    [1] M. Cucuringu, P. Rombach, S. H. Lee, and M. A. Porter Detection of core-periphery structure in networks using spectral methods and geodesic paths. Euro. J. Appl. Math., 27:846–887, 2016.
-
+        - [ ] weighted
+        - [ ] directed
+        - [ ] multiple groups of core-periphery pairs
+        - [ ] continuous core-periphery structure
     """
 
     def __init__(self, beta=0.1):
+        """Initialize algorithm.
+
+        :param beta: parameter of the algorithm. See the original paper., defaults to 0.1
+        :type beta: float, optional
+        """
         self.beta = beta
 
     def detect(self, G):
         """Detect a single core-periphery pair.
 
-        Parameters
-        ----------
-        G : NetworkX graph object
-
-        Examples
-        --------
-        >>> import networkx as nx
-        >>> import cpnet
-        >>> G = nx.karate_club_graph()  # load the karate club network.
-        >>> lrc = cp.LowRankCore()
-        >>> lrc.detect(G)
-
+        :param G: Graph
+        :type G: networkx.Graph or scipy sparse matrix
         """
-
         A, nodelabel = utils.to_adjacency_matrix(G)
         x = self._low_rank_core(A)
 
@@ -81,6 +57,17 @@ class LowRankCore(CPAlgorithm):
         self.qs_ = Q
 
     def _score(self, A, c, x):
+        """Calculate the strength of core-periphery pairs.
+
+        :param A: Adjacency amtrix
+        :type A: scipy sparse matrix
+        :param c: group to which a node belongs
+        :type c: dict
+        :param x: core (x=1) or periphery (x=0)
+        :type x: dict
+        :return: strength of core-periphery
+        :rtype: float
+        """
         N = A.shape[0]
         Mcc = np.dot(x.T @ A, x) / 2
         Mcp = np.dot(x.T @ A, (1 - x))
@@ -96,9 +83,19 @@ class LowRankCore(CPAlgorithm):
         return [q]
 
     def _find_cut(self, A, score, b):
+        """Find the best cut that maximises the objective.
+
+        :param A: adjacency matrix
+        :type A: scipy sparse matrix
+        :param score: score for each node
+        :type score: numpy.ndarray
+        :param b: prameter
+        :type b: float
+        :return: core vector
+        :rtype: numpy.ndarray
+        """
 
         N = A.shape[0]
-        M = A.count_nonzero()
         qc = np.zeros(N)
         qp = np.zeros(N)
         od = (-score).argsort()
@@ -137,9 +134,15 @@ class LowRankCore(CPAlgorithm):
         return x
 
     def _low_rank_core(self, A):
+        """low rank core algorithm.
+
+        :param A: adjacency matrix
+        :type A: scipy sparse matrix
+        :return: core vector
+        :rtype: numpy.ndarray
+        """
 
         N = A.shape[0]
-        M = A.count_nonzero()
         d, v = eigs(A, k=2, which="LM")
 
         At = (np.dot(v * diags(d), v.T) > 0.5).astype(int)
@@ -152,65 +155,33 @@ class LowRankCore(CPAlgorithm):
 class LapCore(CPAlgorithm):
     """LapCore algorithm.
 
-    LapCore algorithm introduced in Ref.~ [1]
+    M. Cucuringu, P. Rombach, S. H. Lee, and M. A. Porter Detection of core-periphery structure in networks using spectral methods and geodesic paths. Euro. J. Appl. Math., 27:846–887, 2016.
 
-    Parameters
-    ----------
-    beta : float
-        Minimum fraction of core or peripheral nodes.
-        This parameter ensures :math:`\\beta \\leq \\frac{Nc}{N_c + N_p}, \\frac{Np}{N_c + N_p}`, where
-        :math:`N_c` and  :math:`N_p` are the number of core and peripheral nodes, respectively.  (optional, default: 0.1)
-
-    Examples
-    --------
-    Create this object.
+    .. highlight:: python
+    .. code-block:: python
 
     >>> import cpnet
     >>> lc = cpnet.LapCore()
-
-    **Core-periphery detection**
-
-    Detect core-periphery structure in network G (i.e., NetworkX object):
-
     >>> lc.detect(G)
-
-    Retrieve the ids of the core-periphery pair to which each node belongs:
-
     >>> pair_id = lc.get_pair_id()
-
-    Retrieve the coreness:
-
     >>> coreness = lc.get_coreness()
 
     .. note::
 
-       This algorithm can accept unweighted and weighted networks.
-       Also, the algorithm assigns all nodes into the same core-periphery pair by construction, i.e., c[node_name] =0 for all node_name.
-
-    .. rubric:: Reference
-
-    [1] M. Cucuringu, P. Rombach, S. H. Lee, and M. A. Porter Detection of core-periphery structure in networks using spectral methods and geodesic paths. Euro. J. Appl. Math., 27:846–887, 2016.
-
+        - [ ] weighted
+        - [ ] directed
+        - [ ] multiple groups of core-periphery pairs
+        - [ ] continuous core-periphery structure
     """
 
     def __init__(self, beta=0.1):
         self.beta = beta
 
     def detect(self, G):
-        """Detect a single core-periphery pair.
+        """Detect core-periphery structure.
 
-        Parameters
-        ----------
-        G : NetworkX graph object
-
-        Examples
-        --------
-        >>> import networkx as nx
-        >>> import cpnet
-        >>> G = nx.karate_club_graph()  # load the karate club network.
-        >>> lc = cp.LapCore()
-        >>> lc.detect(G)
-
+        :param G: Graph
+        :type G: networkx.Graph or scipy sparse matrix
         """
 
         A, nodelabel = utils.to_adjacency_matrix(G)
@@ -224,8 +195,18 @@ class LapCore(CPAlgorithm):
         self.qs_ = Q
 
     def _score(self, A, c, x):
+        """Calculate the strength of core-periphery pairs.
+
+        :param A: Adjacency amtrix
+        :type A: scipy sparse matrix
+        :param c: group to which a node belongs
+        :type c: dict
+        :param x: core (x=1) or periphery (x=0)
+        :type x: dict
+        :return: strength of core-periphery
+        :rtype: float
+        """
         N = A.shape[0]
-        M = A.count_nonzero()
         Mcc = np.dot(x.T * A, x) / 2
         Mcp = np.dot(x.T * A, (1 - x))
         Mpp = np.dot(x.T * A, x) / 2
@@ -241,8 +222,18 @@ class LapCore(CPAlgorithm):
         return [q]
 
     def _find_cut(self, A, score, b):
+        """Find the best cut that maximises the objective.
+
+        :param A: adjacency matrix
+        :type A: scipy sparse matrix
+        :param score: score for each node
+        :type score: numpy.ndarray
+        :param b: prameter
+        :type b: float
+        :return: core vector
+        :rtype: numpy.ndarray
+        """
         N = A.shape[0]
-        M = A.count_nonzero()
         qc = np.zeros(N)
         qp = np.zeros(N)
         od = (-score).argsort()
@@ -281,8 +272,14 @@ class LapCore(CPAlgorithm):
         return x
 
     def _lap_core(self, A):
+        """low rank core algorithm.
+
+        :param A: adjacency matrix
+        :type A: scipy sparse matrix
+        :return: core vector
+        :rtype: numpy.ndarray
+        """
         N = A.shape[0]
-        M = A.count_nonzero()
         deg = np.array(A.sum(axis=1)).reshape(-1)
         denom = np.zeros(N)
         denom[deg > 0] = 1.0 / (deg[deg > 0] + 1.0)
@@ -295,58 +292,38 @@ class LapCore(CPAlgorithm):
 class LapSgnCore(CPAlgorithm):
     """LowSgnCore algorithm.
 
-    LapSgnCore algorithm introduced in Ref.~ [1]
+    M. Cucuringu, P. Rombach, S. H. Lee, and M. A. Porter Detection of core-periphery structure in networks using spectral methods and geodesic paths. Euro. J. Appl. Math., 27:846–887, 2016.
 
-    Examples
-    --------
-    Create this object.
+    .. highlight:: python
+    .. code-block:: python
 
     >>> import cpnet
     >>> lsc = cpnet.LapSgnCore()
-
-    **Core-periphery detection**
-
-    Detect core-periphery structure in network G (i.e., NetworkX object):
-
     >>> lsc.detect(G)
-
-    Retrieve the ids of the core-periphery pair to which each node belongs:
-
     >>> pair_id = lsc.get_pair_id()
-
-    Retrieve the coreness:
-
     >>> coreness = lsc.get_coreness()
 
     .. note::
 
-       This algorithm can accept unweighted and weighted networks.
-       Also, the algorithm assigns all nodes into the same core-periphery pair by construction, i.e., c[node_name] =0 for all node_name.
-
-    .. rubric:: Reference
-
-    [1] M. Cucuringu, P. Rombach, S. H. Lee, and M. A. Porter Detection of core-periphery structure in networks using spectral methods and geodesic paths. Euro. J. Appl. Math., 27:846–887, 2016.
-
+        - [ ] weighted
+        - [ ] directed
+        - [ ] multiple groups of core-periphery pairs
+        - [ ] continuous core-periphery structure
     """
 
-    def __init__(self):
-        self.beta = 0.1
+    def __init__(self, beta=0.1):
+        """Initialize algorithm.
+
+        :param beta: parameter of the algorithm. See the original paper., defaults to 0.1
+        :type beta: float, optional
+        """
+        self.beta = beta
 
     def detect(self, G):
         """Detect a single core-periphery pair.
 
-        Parameters
-        ----------
-        G : NetworkX graph object
-
-        Examples
-        --------
-        >>> import networkx as nx
-        >>> import cpnet
-        >>> G = nx.karate_club_graph()  # load the karate club network.
-        >>> lsc = cp.LapSgnCore()
-        >>> lsc.detect(G)
-
+        :param G: Graph
+        :type G: networkx.Graph or scipy sparse matrix
         """
 
         A, nodelabel = utils.to_adjacency_matrix(G)
@@ -361,6 +338,17 @@ class LapSgnCore(CPAlgorithm):
         self.qs_ = Q
 
     def _score(self, A, c, x):
+        """Calculate the strength of core-periphery pairs.
+
+        :param A: Adjacency amtrix
+        :type A: scipy sparse matrix
+        :param c: group to which a node belongs
+        :type c: dict
+        :param x: core (x=1) or periphery (x=0)
+        :type x: dict
+        :return: strength of core-periphery
+        :rtype: float
+        """
         N = A.shape[0]
         Mcc = np.dot(x.T @ A, x) / 2
         Mcp = np.dot(x.T @ A, (1 - x))
@@ -377,9 +365,15 @@ class LapSgnCore(CPAlgorithm):
         return [q]
 
     def _lapsgn_core(self, A):
+        """lapsgn  algorithm.
+
+        :param A: adjacency matrix
+        :type A: scipy sparse matrix
+        :return: core vector
+        :rtype: numpy.ndarray
+        """
 
         N = A.shape[0]
-        M = A.count_nonzero()
         deg = np.array(A.sum(axis=0)).reshape(-1)
         denom = np.zeros(N)
         denom[deg > 0] = 1.0 / (deg[deg > 0] + 1.0)
