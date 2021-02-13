@@ -1,73 +1,53 @@
-from .CPAlgorithm import *
-from .BE import BE
-from . import utils
-from scipy import sparse
 import numba
+import numpy as np
+from scipy import sparse
+
+from . import utils
+from .BE import BE
+from .CPAlgorithm import CPAlgorithm
 
 
 class Divisive(CPAlgorithm):
-    """Divisive algorithm.
+    """Borgatti Everett algorithm.
 
-    An algorithm for finding multiple core-periphery pairs in networks.
     This algorithm partitions a network into communities using the Louvain algorithm.
     Then, it partitions each community into a core and a periphery using the BE algorithm.
     The quality of a community is computed by that equipped with the BE algorithm.
 
-    Parameters
-    ----------
-    num_runs : int
-        Number of runs of the algorithm (optional, default: 10)
-        Run the algorithm num_runs times. Then, this algorithm outputs the result yielding the maximum quality.
+    S. Kojaku and N. Masuda. Core-periphery structure requires something else in the network. New Journal of Physics, 20(4):43012, 2018
 
-    Examples
-    --------
-    Create this object.
+    .. highlight:: python
+    .. code-block:: python
 
-    >>> import cpnet
-    >>> dv = cpnet.Divisive()
-
-    **Core-periphery detection**
-
-    Detect core-periphery structure in network G (i.e., NetworkX object):
-
-    >>> dv.detect(G)
-
-    Retrieve the ids of the core-periphery pair to which each node belongs:
-
-    >>> pair_id = dv.get_pair_id()
-
-    Retrieve the coreness:
-
-    >>> coreness = dv.get_coreness()
+        >>> import cpnet
+        >>> alg = cpnet.Divisive()
+        >>> alg.detect(G)
+        >>> pair_id = alg.get_pair_id()
+        >>> coreness = alg.get_coreness()
 
     .. note::
 
-       This algorithm accepts unweighted and undirected networks only.
-       This algorithm is stochastic, i.e., one would obtain different results at each run.
-
-    .. rubric:: Reference
-
-        [1] S. Kojaku and N. Masuda. Core-periphery structure requires something else in the network. New Journal of Physics, 20(4):43012, 2018
-
+        - [x] weighted
+        - [ ] directed
+        - [x] multiple groups of core-periphery pairs
+        - [ ] continuous core-periphery structure
     """
 
     def __init__(self, num_runs=10):
+        """Initialize algorithm.
+
+        :param num_runs: number of runs, defaults to 10
+        :type num_runs: int, optional
+        """
         self.num_runs = num_runs
 
     def detect(self, G):
-        """Detect a single core-periphery pair using the Borgatti-Everett algorithm.
+        """Detect core-periphery structure.
 
-        Parameters
-        ----------
-        G : NetworkX graph object
-
-        Examples
-        --------
-        >>> import networkx as nx
-        >>> import cpnet
-        >>> G = nx.karate_club_graph()  # load the karate club network.
-        >>> dv = cpnet.Divisive()
-        >>> dv.detect(G)
+        :param G: Graph
+        :type G: networkx.Graph or scipy sparse matrix
+        :return: None
+        :rtype: None
         """
 
         A, nodelabel = utils.to_adjacency_matrix(G)
@@ -95,7 +75,17 @@ class Divisive(CPAlgorithm):
         self.qs_ = q
 
     def _score(self, A, c, x):
-        N = A.shape[0]
+        """Calculate the strength of core-periphery pairs.
+
+        :param A: Adjacency amtrix
+        :type A: scipy sparse matrix
+        :param c: group to which a node belongs
+        :type c: dict
+        :param x: core (x=1) or periphery (x=0)
+        :type x: dict
+        :return: strength of core-periphery
+        :rtype: float
+        """
         be = BE()
         q = []
         for cid in range(np.max(c) + 1):
@@ -107,6 +97,21 @@ class Divisive(CPAlgorithm):
 
 @numba.jit(nopython=True, cache=True)
 def _label_switching_(A_indptr, A_indices, A_data, num_nodes, alpha=0.5):
+    """Modularity maximization based on the label switching algorithm.
+
+    :param A_indptr: A.indptr, where A is scipy.csr_sparse matrix
+    :type A_indptr: numpy.ndarray
+    :param A_indices: A.indices, where A is scipy.csr_sparse matrix
+    :type A_indices: numpy.ndarray
+    :param A_data: A.data, where A is scipy.csr_sparse matrix
+    :type A_data: numpy.ndarray
+    :param num_nodes: number of nodes
+    :type num_nodes: int
+    :param alpha: resolution, defaults to 0.5
+    :type alpha: float, optional
+    :return: group membership
+    :rtype: numpy.ndarray
+    """
 
     deg = np.zeros(num_nodes)
     D = np.zeros(num_nodes)
@@ -124,7 +129,7 @@ def _label_switching_(A_indptr, A_indices, A_data, num_nodes, alpha=0.5):
         order = np.random.choice(num_nodes, size=num_nodes, replace=False)
         updated_node_num = 0
 
-        for k, node_id in enumerate(order):
+        for _k, node_id in enumerate(order):
 
             # Get the weight and normalized weight
             neighbors = A_indices[A_indptr[node_id] : A_indptr[node_id + 1]]
@@ -136,7 +141,6 @@ def _label_switching_(A_indptr, A_indices, A_data, num_nodes, alpha=0.5):
             qself = 0
             dqmax = 0
             for cprime in clist:
-                neis = neighbors[cids[neighbors] == cprime]
                 dq = (1 - alpha) * np.sum(weight[cids[neighbors] == cprime])
 
                 D_prime = D[cprime] - deg[node_id] * (cprime == cids[node_id])
@@ -175,7 +179,6 @@ def _score_(A_indptr, A_indices, A_data, _c, num_nodes, alpha=0.5):
     D = np.zeros(num_nodes)
     deg = np.zeros(num_nodes)
     selfloop = np.zeros(num_nodes)
-    rho = 0
     doubleM = 0
     for i in range(num_nodes):
         neighbors = A_indices[A_indptr[i] : A_indptr[i + 1]]
@@ -187,7 +190,6 @@ def _score_(A_indptr, A_indices, A_data, _c, num_nodes, alpha=0.5):
         D[_c[i]] += deg[i]
         doubleM += np.sum(weight)
 
-    rho = doubleM / (num_nodes * num_nodes)
     Q = 0
     for k in range(K):
         q[k] = (1 - alpha) * q[k] - alpha * (D[k] * D[k]) / doubleM

@@ -1,74 +1,56 @@
-from .CPAlgorithm import *
-from . import utils
 import numba
+import numpy as np
+
+from . import utils
+from .CPAlgorithm import CPAlgorithm
 
 
 class KM_config(CPAlgorithm):
     """Kojaku-Masuda algorithm with the configuration model.
 
-	This algorithm finds multiple core-periphery pairs in networks.
-	In the detection of core-periphery pairs, the configuration model is used as the null model.
+    This algorithm finds multiple core-periphery pairs in networks.
 
-	Parameters
-	----------
-	num_runs : int
-		Number of runs of the algorithm  (optional, default: 1).
+    S. Kojaku and N. Masuda. Core-periphery structure requires something else in networks. New J. Phys. 2018
 
-	Examples
-	--------
-	Create this object.
+    .. highlight:: python
+    .. code-block:: python
 
-	>>> import cpnet
-	>>> km = cpnet.KM_config()
+        >>> import cpnet
+        >>> alg = cpnet.KM_config()
+        >>> alg.detect(G)
+        >>> pair_id = alg.get_pair_id()
+        >>> coreness = alg.get_coreness()
 
-	**Core-periphery detection**
+    .. note::
 
-	Detect core-periphery structure in network G (i.e., NetworkX object):
-
-	>>> km.detect(G)
-
-	Retrieve the ids of the core-periphery pair to which each node belongs:
-
-	>>> pair_id = km.get_pair_id()
-
-	Retrieve the coreness:
-
-	>>> coreness = km.get_coreness()
-
-	.. note::
-
-	   This algorithm can accept unweighted and weighted networks.
-
-	.. rubric:: Reference
-
-        [1] S. Kojaku and N. Masuda. Core-periphery structure requires something else in networks. New J. Phys. 2018
-
-	"""
+        - [x] weighted
+        - [ ] directed
+        - [x] multiple groups of core-periphery pairs
+        - [ ] continuous core-periphery structure
+    """
 
     def __init__(self, num_runs=10):
+        """Initialize algorithm.
+
+        :param num_runs: number of runs, defaults to 10
+        :type num_runs: int, optional
+        """
         self.num_runs = num_runs
         self.alpha = 0.5
 
     def detect(self, G):
-        """Detect multiple core-periphery pairs.
+        """Detect core-periphery structure.
 
-	Parameters
-	----------
-	G : NetworkX graph object
-
-	Examples
-	--------
-	>>> import networkx as nx
-	>>> import cpnet
-	>>> G = nx.karate_club_graph()  # load the karate club network.
-	>>> km = cp.KM_config() # label switching algorithm
-	>>> km.detect(G)
-	"""
+        :param G: Graph
+        :type G: networkx.Graph or scipy sparse matrix
+        :return: None
+        :rtype: None
+        """
         A, nodelabel = utils.to_adjacency_matrix(G)
 
-        c = x = None
+        x = None
         Q = -np.inf
-        for i in range(self.num_runs):
+        for _i in range(self.num_runs):
             cidsi, xi = _label_switching_(
                 A.indptr, A.indices, A.data, A.shape[0], alpha=self.alpha
             )
@@ -91,6 +73,17 @@ class KM_config(CPAlgorithm):
         self.qs_ = qs
 
     def _score(self, A, c, x):
+        """Calculate the strength of core-periphery pairs.
+
+        :param A: Adjacency amtrix
+        :type A: scipy sparse matrix
+        :param c: group to which a node belongs
+        :type c: dict
+        :param x: core (x=1) or periphery (x=0)
+        :type x: dict
+        :return: strength of core-periphery
+        :rtype: float
+        """
         num_nodes = A.shape[0]
         Q, qs = _score_(A.indptr, A.indices, A.data, c, x, num_nodes, self.alpha)
         return qs
@@ -117,11 +110,11 @@ def _label_switching_(A_indptr, A_indices, A_data, num_nodes, alpha=0.5, itnum_m
         selfloop[nid] = np.sum(weight[neighbors == nid])
 
     M = np.sum(deg) / 2
-    for it in range(itnum_max):
+    for _it in range(itnum_max):
         order = np.random.choice(num_nodes, size=num_nodes, replace=False)
         updated_node_num = 0
 
-        for k, node_id in enumerate(order):
+        for _k, node_id in enumerate(order):
 
             # Get the weight and normalized weight
             neighbors = A_indices[A_indptr[node_id] : A_indptr[node_id + 1]]

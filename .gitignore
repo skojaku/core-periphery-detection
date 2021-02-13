@@ -1,0 +1,110 @@
+TeX
+*.aux
+*.bbl
+*.blg
+*.bcf
+*.synctex.gz
+*.toc
+*blx.bib
+*.fls
+*.fdb_latexmk
+*.out
+*.run.xml
+main.pdf
+supp.pdf
+*.log
+mainNotes.bib
+
+# Project folders
+data
+shared_data
+figs
+local_figs/
+
+# Data files
+*.csv
+*.tsv
+*.txt
+
+# figures
+*.pdf
+*.gif
+*.dvi
+
+# Office files
+*.docx
+*.doc
+*.ppt
+*.pptx
+*.xls
+*.xlsx
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Snakemake
+.snakemake
+workflow/config.yaml
+
+# Others
+.DS_Store
+*.un~
+
+###################### Standard Python gitignore
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# PyInstaller
+#  Usually these files are written by a python script from a template
+#  before PyInstaller builds the exe, so as to inject date/other infos into it.
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*,cover
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+target/
