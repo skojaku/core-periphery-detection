@@ -1,101 +1,73 @@
-from .CPAlgorithm import *
-from simanneal import Annealer
 import random
-from . import utils
+
 import numba
+import numpy as np
+from simanneal import Annealer
+
+from . import utils
+from .CPAlgorithm import CPAlgorithm
 
 
 class Rombach(CPAlgorithm):
     """Rombach's algorithm for finding continuous core-periphery structure.
 
-    Parameters
-    ----------
-    num_runs : int
-        Number of runs of the algorithm  (optional, default: 1).
+    P. Rombach, M. A. Porter, J. H. Fowler, and P. J. Mucha. Core-Periphery Structure in Networks (Revisited). SIAM Review, 59(3):619–646, 2017
 
-    alpha : float
-        Sharpness of core-periphery boundary (optional, default: 0.5).
+    .. highlight:: python
+    .. code-block:: python
 
-        alpha=0 or alpha=1 gives the fuzziest or sharpest boundary, respectively.
-
-    beta : float
-        Fraction of peripheral nodes (optional, default: 0.8)
-
-    algorithm : str
-        Optimisation algorithm (optional, default: 'ls')
-            In the original paper [1], the authors adopted a simulated annealing to optimise the objective function, which is computationally demanding.
-            To mitigate the computational cost, a label switching algorithm is implemented in cpnet.
-            One can choose either algorithm by specifying algorithm='ls' (i.e., label switching) or algorithm='sa' (i.e., simulated annealing).
+        >>> import cpnet
+        >>> alg = cpnet.Rombach()
+        >>> alg.detect(G)
+        >>> pair_id = alg.get_pair_id()
+        >>> coreness = alg.get_coreness()
 
     .. note::
 
-       The parameters of the simulated annealing such as the initial temperature and cooling schedule are different from those used in the original paper [1].
-
-
-    Examples
-    --------
-    Create this object.
-
-    >>> import cpnet
-    >>> rb = cpnet.Rombach()
-
-    **Core-periphery detection**
-
-    Detect core-periphery structure in network G (i.e., NetworkX object):
-
-    >>> rb.detect(G)
-
-    Retrieve the ids of the core-periphery pair to which each node belongs:
-
-    >>> pair_id = rb.get_pair_id()
-
-    Retrieve the coreness:
-
-    >>> coreness = rb.get_coreness()
-
-    .. note::
-
-       This algorithm can accept unweighted and weighted networks.
-       The algorithm assigns all nodes into the same core-periphery pair by construction, i.e., c[node_name] =0 for all node_name.
-
-    .. rubric:: Reference
-
-        [1] P. Rombach, M. A. Porter, J. H. Fowler, and P. J. Mucha. Core-Periphery Structure in Networks (Revisited). SIAM Review, 59(3):619–646, 2017
-
+        - [x] weighted
+        - [ ] directed
+        - [ ] multiple groups of core-periphery pairs
+        - [x] continuous core-periphery structure
     """
 
     def __init__(self, num_runs=10, alpha=0.5, beta=0.8, algorithm="ls"):
+        """[summary]
+
+        :param num_runs: Number of runs of the algorithm, defaults to 10
+        :type num_runs: int, optional
+        :param alpha: Sharpness of core-periphery boundary, defaults to 0.5
+        :type alpha: float, optional
+        :param beta: Fraction of peripheral nodes, defaults to 0.8
+        :type beta: float, optional
+        :param algorithm: Optimisation algorithm, defaults to "ls"
+        :type algorithm: str, optional
+
+        .. note::
+
+            In the original paper, the authors adopted a simulated annealing to optimise the objective function, which is computationally demanding.
+            To mitigate the computational cost, a label switching algorithm is implemented in cpnet.
+            One can choose either algorithm by specifying algorithm='ls' (i.e., label switching) or algorithm='sa' (i.e., simulated annealing).
+        """
         self.num_runs = num_runs
         self.alpha = alpha
         self.beta = beta
         self.algorithm = algorithm
 
     def detect(self, G):
-        """Detect a single core-periphery pair.
+        """Detect core-periphery structure.
 
-        Parameters
-        ----------
-        G : NetworkX graph object
-
-        Examples
-        --------
-        >>> import networkx as nx
-        >>> import cpnet
-        >>> G = nx.karate_club_graph()  # load the karate club network.
-        >>> rb = cp.Rombach(algorithm='ls') # label switching algorithm
-        >>> rb.detect(G)
-        >>> rb = cp.Rombach(algorithm='sa') # simulated annealing
-        >>> rb.detect(G)
-
+        :param G: Graph
+        :type G: networkx.Graph or scipy sparse matrix
+        :return: None
+        :rtype: None
         """
 
         Qbest = -100
-        cbest = 0
         xbest = 0
         qbest = 0
         A, nodelabel = utils.to_adjacency_matrix(G)
         self.Q_ = 0
-        for i in range(self.num_runs):
+        for _i in range(self.num_runs):
             if self.algorithm == "ls":
                 x, Q = self._label_switching(A, self.alpha, self.beta)
             elif self.algorithm == "sa":
@@ -106,8 +78,8 @@ class Rombach(CPAlgorithm):
                 qbest = Q
 
         self.nodelabel = nodelabel
-        self.c_ = np.zeros(x.size).astype(int)
-        self.x_ = x
+        self.c_ = np.zeros(xbest.size).astype(int)
+        self.x_ = xbest
         self.Q_ = qbest
         self.qs_ = [qbest]
 
@@ -140,6 +112,17 @@ class Rombach(CPAlgorithm):
         return x, Q
 
     def _score(self, A, c, x):
+        """Calculate the strength of core-periphery pairs.
+
+        :param A: Adjacency amtrix
+        :type A: scipy sparse matrix
+        :param c: group to which a node belongs
+        :type c: dict
+        :param x: core (x=1) or periphery (x=0)
+        :type x: dict
+        :return: strength of core-periphery
+        :rtype: float
+        """
         return [x.T @ A @ x]
 
 
@@ -156,7 +139,7 @@ class SimAlg(Annealer):
         self.updates = 100
 
     def move(self):
-        """Swaps two nodes"""
+        """Swaps two nodes."""
         a = random.randint(0, len(self.state) - 1)
         b = random.randint(0, len(self.state) - 1)
         self.state[[a, b]] = self.state[[b, a]]
