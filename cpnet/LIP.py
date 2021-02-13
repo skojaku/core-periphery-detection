@@ -1,6 +1,7 @@
-from .CPAlgorithm import *
-from . import utils
 import numba
+
+from . import utils
+from .CPAlgorithm import CPAlgorithm
 
 
 @numba.jit(nopython=True, cache=True)
@@ -11,7 +12,7 @@ def _score_(A_indptr, A_indices, A_data, num_nodes, x):
     ncc = 0
     for i in range(num_nodes):
         neighbors = A_indices[A_indptr[i] : A_indptr[i + 1]]
-        for k, nei in enumerate(neighbors):
+        for _k, nei in enumerate(neighbors):
             mcc += x[i] * x[nei]
             mpp += (1 - x[nei]) * (1 - x[nei])
         ncc += x[i]
@@ -22,67 +23,41 @@ def _score_(A_indptr, A_indices, A_data, num_nodes, x):
     return Q
 
 
-class LIP(CPAlgorithm):
+class Lip(CPAlgorithm):
     """Lip's algorithm.
 
-    Lip's algorithm for finding discrete core-periphery pairs [1].
+    Lip's algorithm for finding discrete core-periphery structure.
 
-    Examples
-    --------
-    Create this object.
+    S. Z. W.~ Lip. A fast algorithm for the discrete core/periphery bipartitioning problem. arXiv, pages 1102.5511, 2011.
 
-    >>> import cpnet
-    >>> lip = cpnet.Lip()
+    .. highlight:: python
+    .. code-block:: python
 
-    **Core-periphery detection**
-
-    Detect core-periphery structure in network G (i.e., NetworkX object):
-
-    >>> lip.detect(G)
-
-    Retrieve the ids of the core-periphery pair to which each node belongs:
-
-    >>> pair_id = mrs.get_pair_id()
-
-    Retrieve the coreness:
-
-    >>> coreness = lip.get_coreness()
+        >>> import cpnet
+        >>> alg = cpnet.Lip()
+        >>> alg.detect(G)
+        >>> pair_id = alg.get_pair_id()
+        >>> coreness = alg.get_coreness()
 
     .. note::
 
-       This algorithm accepts unweighted and undirected networks only.
-       Also, the algorithm assigns all nodes into the same core-periphery pair by construction, i.e., c[node_name] =0 for all node_name.
-       This algorithm is deterministic, i.e, one obtains the same result at each run.
-
-    .. rubric:: References
-
-    [1] S. Z. W.~ Lip. A fast algorithm for the discrete core/periphery bipartitioning problem. arXiv, pages 1102.5511, 2011.
-
+        - [ ] weighted
+        - [ ] directed
+        - [ ] multiple groups of core-periphery pairs
+        - [ ] continuous core-periphery structure
     """
 
     def __init__(self):
-        self.num_runs = 0
+        pass
 
     def detect(self, G):
-        """Detect a single core-periphery pair using the LIP algorithm.
+        """Detect core-periphery structure.
 
-        Parameters
-        ----------
-        G : NetworkX graph object
-
-        Examples
-        --------
-
-        >>> import networkx as nx
-        >>> import cpnet
-        >>> G = nx.karate_club_graph()  # load the karate club network.
-        >>> mrs = cp.LIP()
-        >>> mrs.detect(G)
-
-
-
+        :param G: Graph
+        :type G: networkx.Graph or scipy sparse matrix
+        :return: None
+        :rtype: None
         """
-
         A, nodelabel = utils.to_adjacency_matrix(G)
 
         x = self._detect(np.array(A.sum(axis=1)).reshape(-1))
@@ -112,4 +87,15 @@ class LIP(CPAlgorithm):
         return _x
 
     def _score(self, A, c, x):
+        """Calculate the strength of core-periphery pairs.
+
+        :param A: Adjacency amtrix
+        :type A: scipy sparse matrix
+        :param c: group to which a node belongs
+        :type c: dict
+        :param x: core (x=1) or periphery (x=0)
+        :type x: dict
+        :return: strength of core-periphery
+        :rtype: float
+        """
         return [_score_(A.indptr, A.indices, A.data, A.shape[0], x)]
