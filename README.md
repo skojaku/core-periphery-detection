@@ -22,16 +22,13 @@ For pip,
 pip install cpnet
 ```
 
-Dependency:
-- Python version >=3.6
-- decorator==4.4.2
-- joblib==0.16.0
-- llvmlite==0.33.0
-- networkx==2.5rc1
-- numba==0.50.0
-- numpy==1.19.1
-- scipy==1.5.2
-- simanneal==0.5.0
+# Dependency:
+
+See requirements.txt
+
+# APIs
+
+See [documentation]()
 
 # Usage
 
@@ -81,7 +78,7 @@ All algorithms implemented in this package have the same inferface. This means t
 | Algorithm | Reference |
 |-----------|-----------|
 | [cpnet.BE](cpnet/BE.py) | [S. P. Borgatti and M. G. Everett. Models of core/periphery structures. Social Networks, 21, 375–395, 2000](https://www.sciencedirect.com/science/article/abs/pii/S0378873399000192)|
-| [cpnet.MINRES](cpnet/MINRES.py)  | [S. Z. W. Lip. A fast algorithm for the discrete core/periphery bipartitioning problem. Preprint arXiv: 1102.5511, 2011](https://arxiv.org/abs/1102.5511) |
+| [cpnet.Lip](cpnet/Lip.py)  | [S. Z. W. Lip. A fast algorithm for the discrete core/periphery bipartitioning problem. Preprint arXiv: 1102.5511, 2011](https://arxiv.org/abs/1102.5511) |
 | [cpnet.LowRankCore](cpnet/Cucuringu.py) <br> [cpnet.LapCore](cpnet/Cucuringu.py) <br> [cpnet.LapSgnCore](cpnet/Cucuringu.py) | [M. Cucuringu, P. Rombach, S. H. Lee, and M. A. Porter. Detection of core-periphery structure in networks using spectral methods and geodesic paths. European Journal of Applied Mathematics, 846–887, 2016](https://www.cambridge.org/core/journals/european-journal-of-applied-mathematics/article/detection-of-coreperiphery-structure-in-networks-using-spectral-methods-and-geodesic-paths/A08BE0DA1A8AD7C58C24AF53AA134729)|
 | [cpnet.Rombach](cpnet/Rombach.py)  | [P. Rombach, M. A. Porter, J. H. Fowler, and P. J. Mucha. Core-Periphery Structure in Networks (Revisited). SIAM Review, 59, 619–646, 2017](https://epubs.siam.org/doi/10.1137/17M1130046) |
 | [cpnet.Rossa](cpnet/Rossa.py)  | [F. Rossa, F. Dercole, and C. Piccardi. Profiling core-periphery network structure by random walkers. Scientific Reports, 3, 1467, 2013](https://www.nature.com/articles/srep01467) |
@@ -94,7 +91,7 @@ Some algorithms have tuning parameters. Please see the source code for the param
 One can detect
 
 - a single pair of a core and a periphery using
-  - `cpnet.BE`, `cpnet.MINRES`, `cpnet.LapCore`, `cpnet.LapSgnCore`, `cpnet.Surprise`
+  - `cpnet.BE`, `cpnet.Lip`, `cpnet.LapCore`, `cpnet.LapSgnCore`, `cpnet.Surprise`
 - multiple pairs of a core and a periphery using
   - `cpnet.KM_ER`, `cpnet.KM_config`, `cpnet.Divisive`
 - a continuous spectrum between a core and a periphery using
