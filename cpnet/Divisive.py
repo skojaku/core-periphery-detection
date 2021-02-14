@@ -8,7 +8,7 @@ from .CPAlgorithm import CPAlgorithm
 
 
 class Divisive(CPAlgorithm):
-    """Borgatti Everett algorithm.
+    """Divisive algorithm.
 
     This algorithm partitions a network into communities using the Louvain algorithm.
     Then, it partitions each community into a core and a periphery using the BE algorithm.

@@ -10,8 +10,6 @@ from .CPAlgorithm import CPAlgorithm
 class LowRankCore(CPAlgorithm):
     """LowRankCore algorithm.
 
-    LowRankCore algorithm
-
     M. Cucuringu, P. Rombach, S. H. Lee, and M. A. Porter Detection of core-periphery structure in networks using spectral methods and geodesic paths. Euro. J. Appl. Math., 27:846–887, 2016.
 
     .. highlight:: python

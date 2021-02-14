@@ -27,8 +27,6 @@ def _score_(A_indptr, A_indices, A_data, num_nodes, x):
 class Lip(CPAlgorithm):
     """Lip's algorithm.
 
-    Lip's algorithm for finding discrete core-periphery structure.
-
     S. Z. W.~ Lip. A fast algorithm for the discrete core/periphery bipartitioning problem. arXiv, pages 1102.5511, 2011.
 
     .. highlight:: python
