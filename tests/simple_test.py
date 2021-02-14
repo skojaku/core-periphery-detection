@@ -43,7 +43,6 @@ class TestCalc(unittest.TestCase):
             model.detect(self.G)
             pair_id = model.get_pair_id()
             coreness = model.get_coreness()
-
             self.assertIsInstance(pair_id, dict)
             self.assertIsInstance(coreness, dict)
 
