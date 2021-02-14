@@ -19,18 +19,18 @@ All algorithms are implemented in Python, with speed accelerations by numba, and
 
 Before installing this package, make sure that you have a **Python with version 3.6 or above**.
 
-There are two ways to install this package, *conda* or *pip*. conda is recommended if you have a conda environment. Otherwise, use pip.  
-
-For conda,   
-
-```bash
-conda install -c conda-forge -c skojaku cpnet 
-```
-
-For pip, 
+`pip` is the most easiest way to install:
 
 ```bash
 pip install cpnet
+```
+
+For `conda` users, although the package can be install using `pip` without problem in conda environement, you may want to avoid mixing pip with conda. In this case, we recommend making a link to the package:
+
+```bash
+git clone https://github.com/skojaku/core-periphery-detection
+cd core-periphery-detection
+conda develop .
 ```
 
 ### Dependency:
