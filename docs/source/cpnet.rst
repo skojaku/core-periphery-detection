@@ -60,6 +60,14 @@ cpnet.Lip module
    :undoc-members:
    :show-inheritance:
 
+cpnet.MINRES module
+-------------------
+
+.. automodule:: cpnet.MINRES
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 cpnet.Rombach module
 --------------------
 
@@ -80,6 +88,14 @@ cpnet.Surprise module
 ---------------------
 
 .. automodule:: cpnet.Surprise
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+cpnet.adam module
+-----------------
+
+.. automodule:: cpnet.adam
    :members:
    :undoc-members:
    :show-inheritance:
