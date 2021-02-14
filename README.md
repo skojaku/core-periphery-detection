@@ -1,5 +1,6 @@
 # A Python package for detecting core-periphery structure in networks
 [![Build Status](https://travis-ci.org/skojaku/core-periphery-detection.svg?branch=master)](https://travis-ci.org/skojaku/core-periphery-detection)
+![.github/workflows/main.yml](https://github.com/skojaku/core-periphery-detection/workflows/.github/workflows/main.yml/badge.svg?branch=master)
 
 This package contains algorithms for detecting core-periphery structure in networks.
 All algorithms are implemented in Python, with speed accelerations by numba, and can be used with a small coding effort.
