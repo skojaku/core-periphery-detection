@@ -189,10 +189,11 @@ def draw(
         node_color=[node_colors[d] for d in colored_nodes],
         nodelist=colored_nodes,
         ax=ax,
-        zorder=3,
+        # zorder=3,
         **draw_nodes_kwd
     )
     if nodes is not None:
+        nodes.set_zorder(3)
         nodes.set_edgecolor([node_edge_colors[r] for r in colored_nodes])
 
     # Draw nodes that do not belong to the top max_colored_group_num core-periphery pairs
@@ -204,10 +205,11 @@ def draw(
         node_color="#8d8d8d",
         nodelist=muted_nodes,
         ax=ax,
-        zorder=2,
         **draw_nodes_kwd_muted_nodes
     )
+    print("sada")
     if nodes is not None:
+        nodes.set_zorder(2)
         nodes.set_edgecolor("#8d8d8d")
 
     draw_nodes_kwd_residual = draw_nodes_kwd.copy()
@@ -219,10 +221,10 @@ def draw(
         nodelist=residuals,
         node_shape="s",
         ax=ax,
-        zorder=1,
         **draw_nodes_kwd_residual
     )
     if nodes is not None:
+        nodes.set_zorder(1)
         nodes.set_edgecolor("#4d4d4d")
 
     if draw_edge:
