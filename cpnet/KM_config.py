@@ -128,40 +128,54 @@ def _label_switching_(A_indptr, A_indices, A_data, num_nodes, alpha=0.5, itnum_m
             for cprime in clist:
                 for xprime in [0, 1]:
                     neis = neighbors[cids[neighbors] == cprime]
-                    neis_c = neighbors[cids[neighbors] == cids[node_id]]
+                    #neis_c = neighbors[cids[neighbors] == cids[node_id]]
 
-                    d_c_1 = np.sum(weight[x[neis_c] == 1])
-                    d_c_0 = np.sum(weight[x[neis_c] == 0])
-                    d_cprime_1 = np.sum(weight[x[neis] == 1])
-                    d_cprime_0 = np.sum(weight[x[neis] == 0])
-
-                    dq = d_cprime_1 + d_cprime_0 * xprime
-                    dq+= -deg[node_id] * (Dcore[cprime] + xprime * Dperi[cprime]) / (2.0 * M)
-
-                    dq+= -(deg[node_id] ** 2 / (4.0 * M)) * (xprime - 2 * (x[node_id] + xprime - x[node_id] * xprime)) * (cprime == cids[node_id])
-
-                    dq+= -d_c_1 - d_c_0 * x[node_id] + deg[node_id] * (Dcore[cids[node_id]] + x[node_id] * Dperi[cids[node_id]]) / (2.0 * M)
-                    dq+= x[node_id] * deg[node_id] ** 2 / (4.0 * M)
-
-                    dq/=M
-
-#                    non_pp_edges = x[neis] + (1 - x[neis]) * xprime
-#                    dq = (1 - alpha) * np.sum(
-#                        weight[cids[neighbors] == cprime] * non_pp_edges
+#                    d_c_1 = np.sum(weight[x[neis_c] == 1])
+#                    d_c_0 = np.sum(weight[x[neis_c] == 0])
+#                    d_cprime_1 = np.sum(weight[x[neis] == 1])
+#                    d_cprime_0 = np.sum(weight[x[neis] == 0])
+#
+#                    dq = d_cprime_1 + d_cprime_0 * xprime
+#                    dq += (
+#                        -deg[node_id]
+#                        * (Dcore[cprime] + xprime * Dperi[cprime])
+#                        / (2.0 * M)
 #                    )
 #
-#                    Dc_prime = Dcore[cprime] - deg[node_id] * xprime * (
-#                        cprime == cids[node_id]
-#                    )
-#                    Dp_prime = Dperi[cprime] - deg[node_id] * (1 - xprime) * (
-#                        cprime == cids[node_id]
-#                    )
-#                    dq -= alpha * (Dc_prime + Dp_prime * xprime) / (2.0 * M)
 #                    dq += (
-#                        0.5
-#                        * xprime
-#                        * (selfloop[node_id] - deg[node_id] * deg[node_id] / (2 * M))
+#                        -(deg[node_id] ** 2 / (4.0 * M))
+#                        * (xprime - 2 * (x[node_id] + xprime - x[node_id] * xprime))
+#                        * (cprime == cids[node_id])
 #                    )
+#
+#                    dq += (
+#                        -d_c_1
+#                        - d_c_0 * x[node_id]
+#                        + deg[node_id]
+#                        * (Dcore[cids[node_id]] + x[node_id] * Dperi[cids[node_id]])
+#                        / (2.0 * M)
+#                    )
+#                    dq += x[node_id] * deg[node_id] ** 2 / (4.0 * M)
+#
+#                    dq /= M
+
+                    non_pp_edges = x[neis] + (1 - x[neis]) * xprime
+                    dq = (1 - alpha) * np.sum(
+                        weight[cids[neighbors] == cprime] * non_pp_edges
+                    )
+
+                    Dc_prime = Dcore[cprime] - deg[node_id] * xprime * (
+                        cprime == cids[node_id]
+                    )
+                    Dp_prime = Dperi[cprime] - deg[node_id] * (1 - xprime) * (
+                        cprime == cids[node_id]
+                    )
+                    dq -= alpha * (Dc_prime + Dp_prime * xprime) / (2.0 * M)
+                    dq += (
+                        (1-alpha)
+                        * xprime
+                        * (selfloop[node_id] - deg[node_id] * deg[node_id] / (2 * M))
+                    )
 
                     if (cprime == cids[node_id]) and (xprime == x[node_id]):
                         qself = dq
