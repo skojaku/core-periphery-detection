@@ -3,12 +3,13 @@
 %autoreload 2
 
 import matplotlib.pyplot as plt
+import networkx as nx
 import numpy as np
 import pandas as pd
 import seaborn as sns
-from scipy import sparse, stats
 from matplotlib import patches
-import networkx as nx
+from scipy import sparse, stats
+
 import cpnet
 
 # %%
