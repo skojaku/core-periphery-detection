@@ -39,7 +39,7 @@ def calc_nmi(y, ypred):
 models = {
     "KM_config": cpnet.KM_config(),
     "Modularity": cpnet.Divisive(),
-    #"KM_ER": cpnet.KM_ER(),
+    "KM_ER": cpnet.KM_ER(),
 }
 results = []
 for name, model in models.items():
