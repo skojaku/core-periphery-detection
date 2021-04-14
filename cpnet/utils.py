@@ -115,7 +115,7 @@ def calc_node_pos(G, iterations=300, **params):
         scalingRatio=2.0,
         strongGravityMode=False,
         gravity=1.0,
-        verbose=True,
+        verbose=False,
     )
     if params is not None:
         for k, v in params.items():
@@ -133,7 +133,7 @@ def draw(
     font_size=0,
     pos=None,
     cmap=None,
-    max_colored_group_num=None,
+    max_group_num=None,
     draw_nodes_kwd={},
     draw_edges_kwd={"edge_color": "#adadad"},
     draw_labels_kwd={},
@@ -157,8 +157,8 @@ def draw(
     :type pos: dict, optional
     :param cmap: colomap defaults to None
     :type cmap: matplotlib.cmap, optional
-    :param max_colored_group_num: Number of groups to color, defaults to None
-    :type max_colored_group_num: int, optional
+    :param max_group_num: Number of groups to color, defaults to None
+    :type max_group_num: int, optional
     :param draw_nodes_kwd: Parameter for networkx.draw_networkx_nodes, defaults to {}
     :type draw_nodes_kwd: dict, optional
     :param draw_edges_kwd: Parameter for networkx.draw_networkx_edges, defaults to {"edge_color": "#adadad"}
@@ -172,9 +172,7 @@ def draw(
     """
 
     # Split node into residual and non-residual
-    colored_nodes, muted_nodes, residuals = classify_nodes(
-        G, c, x, max_colored_group_num
-    )
+    colored_nodes, muted_nodes, residuals = classify_nodes(G, c, x, max_group_num)
 
     node_colors, node_edge_colors = set_node_colors(c, x, cmap, colored_nodes)
 
@@ -196,22 +194,6 @@ def draw(
         nodes.set_zorder(3)
         nodes.set_edgecolor([node_edge_colors[r] for r in colored_nodes])
 
-    # Draw nodes that do not belong to the top max_colored_group_num core-periphery pairs
-    draw_nodes_kwd_muted_nodes = draw_nodes_kwd.copy()
-    draw_nodes_kwd_muted_nodes["node_size"] = 0.3 * draw_nodes_kwd.get("node_size", 100)
-    nodes = nx.draw_networkx_nodes(
-        G,
-        pos,
-        node_color="#8d8d8d",
-        nodelist=muted_nodes,
-        ax=ax,
-        **draw_nodes_kwd_muted_nodes
-    )
-    print("sada")
-    if nodes is not None:
-        nodes.set_zorder(2)
-        nodes.set_edgecolor("#8d8d8d")
-
     draw_nodes_kwd_residual = draw_nodes_kwd.copy()
     draw_nodes_kwd_residual["node_size"] = 0.1 * draw_nodes_kwd.get("node_size", 100)
     nodes = nx.draw_networkx_nodes(
@@ -228,7 +210,9 @@ def draw(
         nodes.set_edgecolor("#4d4d4d")
 
     if draw_edge:
-        nx.draw_networkx_edges(G, pos, ax=ax, **draw_edges_kwd)
+        nx.draw_networkx_edges(
+            G.subgraph(colored_nodes + residuals), pos, ax=ax, **draw_edges_kwd
+        )
 
     if font_size > 0:
         nx.draw_networkx_labels(G, pos, ax=ax, font_size=font_size, **draw_labels_kwd)
