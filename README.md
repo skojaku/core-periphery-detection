@@ -132,24 +132,16 @@ sig_c, sig_x, significant, p_values = cpnet.qstest(
 `cpnet` implements a drawing function based on networkx.
 
 ```python
-ax, pos = cpnet.draw(G, c, x, ax, draw_edge=False, draw_nodes_kwd={}, draw_edges_kwd={}, draw_labels_kwd={})
+ax, pos = cpnet.draw(G, c, x, ax, max_group_num = None, draw_edge=False, draw_nodes_kwd={}, draw_edges_kwd={}, draw_labels_kwd={})
 ```
 - `G` is the graph object (Networkx.Graph)
 - `c` and `x` are the core-periphery pairs
 - `ax` is the matplotlib axis
+- `max_group_num`: The top `max_group_num` largest groups will be drawn.
 - `draw_edge` is a boolean (Optional; Default False). Set `draw_edge = True` not to draw the edges (recommended if the network is large)
 - `draw_nodes_kwd={}`, `draw_edges_kwd={}`, and `draw_labels_kwd={}` are the keywords that are passed to networkx.draw_network_nodes, networkx.draw_network_edges, and networkx.draw_network_labels, respectively (see the [networkx documentation](https://networkx.github.io/documentation/stable/reference/drawing.html)). Useful when refining the figure.
 - `pos` is a dict object. The keys are the node ids given by G.nodes(). The values are tuples (x, y) indicating the positions of nodes.
 - See the [code](cpnet/utils.py) for other parameters.
-
-`cpnet` also implements a function for drawing an interactive figure based on plotly.
-
-```python
-fig = cpnet.draw_interactive(G, c, x, hover_text)
-```
-- `G` is the graph object (Networkx.Graph)
-- `c` and `x` are the core-periphery pairs
-- `hover_text` is a dict object (optional), where the key is the node id given by G.nodes() and the value is the text to show in the toolbox.
 
 
 The drawing functions are demonstrated in the example notebook. See
