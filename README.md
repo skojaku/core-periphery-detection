@@ -172,8 +172,12 @@ Some algorithms have tuning parameters. Please see the source code for the param
 One can detect
 
 - a single pair of a core and a periphery using
-  - `cpnet.BE`, `cpnet.Lip`, `cpnet.LapCore`, `cpnet.LapSgnCore`, `cpnet.Surprise`
+  - `cpnet.BE`, `cpnet.Lip`, `cpnet.LapCore`, `cpnet.LapSgnCore`, `cpnet.Surprise`, `cpnet.LowRankCore`
 - multiple pairs of a core and a periphery using
   - `cpnet.KM_ER`, `cpnet.KM_config`, `cpnet.Divisive`
 - a continuous spectrum between a core and a periphery using
   - `cpnet.MINRES`, `cpnet.Rombach`, `cpnet.Rossa`
+
+The following algorithms take the edge weight into account:
+- `cpnet.KM_ER`, `cpnet.KM_config`, `cpnet.Divisive`, `cpnet.Rombach`, `cpnet.Rossa`, `cpnet.LapCore`, `cpnet.LapSgnCore`, `cpnet.LowRankCore`
+
