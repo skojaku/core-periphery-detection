@@ -1,9 +1,11 @@
-import pandas as pd
-import numpy as np
 import sys
-from scipy import sparse
-import networkx as nx
+
 import country_converter as coco
+import networkx as nx
+import numpy as np
+import pandas as pd
+from scipy import sparse
+from scipy.sparse.csgraph import connected_components
 
 
 def load_airport():
@@ -61,15 +63,16 @@ def load_airport():
         (edge_table.weight, (edge_table.source, edge_table.target)),
         shape=(num_nodes, num_nodes),
     )
-    net = net + net.T
-    net.data = np.ones_like(net.data)
 
-    net = nx.from_scipy_sparse_matrix(net)
-    largest_cc = max(nx.connected_components(net), key=len)
-    s = net.subgraph(largest_cc)
-    net = nx.adjacency_matrix(s)
-
-    node_table = node_table.loc[np.array(list(largest_cc)), :]
+    n_components, labels = connected_components(
+        csgraph=net, directed=False, return_labels=True
+    )
+    ulabels, freq = np.unique(labels, return_counts=True)
+    s = labels == ulabels[np.argmax(freq)]
+    # net = net + net.T
+    # net.data = np.ones_like(net.data)
+    node_table = node_table.loc[s, :]
+    net = net[s, :][:, s]
 
     # Add network stats
     node_table["deg"] = np.array(net.sum(axis=0)).reshape(-1)
