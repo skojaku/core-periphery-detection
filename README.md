@@ -44,6 +44,8 @@ This package consists of the following two submodules:
 - A set of algorithms for detecting core-periphery structure in networks
 - Codes for a statistical test for core-periphery structure
 
+See [How to use `cpnet`](examples/How_to_use_cpnet.ipynb) for quick start.
+
 ## Detection of core-periphery structure
 
 Load an algorithm for detecting core-periphery structure in networks:
@@ -147,10 +149,9 @@ ax, pos = cpnet.draw(G, c, x, ax, max_group_num = None, draw_edge=False, draw_no
 The drawing functions are demonstrated in the example notebook. See
 
 # Examples
-- [Example 1 (Detection of core-periphery structure)](notebooks/example1.ipynb)
-- [Example 2 (Statistical test)](notebooks/example2.ipynb)
-- [Example 3 (Case study: Pilitical blog network)](notebooks/example3.ipynb)
-- [Example 4 (Case study: Airport network)](notebooks/example4.ipynb)
+- [How to use `cpnet`](examples/How_to_use_cpnet.ipynb), [Google Colab version](https://colab.research.google.com/github/skojaku/core-periphery-detection/blob/master/examples/How_to_use_cpnet.ipynb)
+- [Example 1 (Case study: Pilitical blog network)](notebooks/example3.ipynb)
+- [Example 2 (Case study: Airport network)](notebooks/example4.ipynb)
 
 
 # Available algorithms
