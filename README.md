@@ -181,3 +181,6 @@ One can detect
 The following algorithms take the edge weight into account:
 - `cpnet.KM_ER`, `cpnet.KM_config`, `cpnet.Divisive`, `cpnet.Rombach`, `cpnet.Rossa`, `cpnet.LapCore`, `cpnet.LapSgnCore`, `cpnet.LowRankCore`
 
+# (Update 2022_05_23) New `Surprise` algorithm
+
+A follow-up study of `Surprise` provides a unified framework to detect communities and core-periphery structure based on surprise. The authors of the paper reported that the new algorithm scales better than the `Surprise` algorithm.  See their [github repo](https://github.com/EmilianoMarchese/SurpriseMeMore) for the code. 
