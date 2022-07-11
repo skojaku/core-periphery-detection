@@ -1,3 +1,4 @@
+# %%
 from collections import Counter, defaultdict
 
 import matplotlib as mpl
@@ -7,9 +8,7 @@ import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 import seaborn as sns
-#from fa2 import ForceAtlas2
 from scipy import sparse
-
 
 def to_adjacency_matrix(net):
     if sparse.issparse(net):
