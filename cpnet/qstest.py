@@ -47,7 +47,7 @@ def qstest(
     significance_level=0.05,
     null_model=config_model,
     sfunc=sz_n,
-    num_of_rand_net=300,
+    num_of_rand_net=100,
     q_tilde=[],
     s_tilde=[],
     **params
@@ -106,7 +106,7 @@ def qstest(
     if len(q_tilde) == 0:
         results = []
         for _ in tqdm(range(num_of_rand_net)):
-            results+=sampling(G, cpa, sfunc, null_model)
+            results+=[sampling(G, cpa, sfunc, null_model)]
         if isinstance(results[0]["q"], list):
             q_tilde = np.array(sum([res["q"] for res in results], []))
         else:
