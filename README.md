@@ -150,8 +150,7 @@ The drawing functions are demonstrated in the example notebook. See
 
 # Examples
 - [How to use `cpnet`](examples/How_to_use_cpnet.ipynb), [Google Colab version](https://colab.research.google.com/github/skojaku/core-periphery-detection/blob/master/examples/How_to_use_cpnet.ipynb)
-- [Example 1 (Case study: Pilitical blog network)](notebooks/example3.ipynb)
-- [Example 2 (Case study: Airport network)](notebooks/example4.ipynb)
+
 
 
 # Available algorithms
