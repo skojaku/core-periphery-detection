@@ -1,5 +1,6 @@
 import copy
 
+import warnings
 import networkx as nx
 import numpy as np
 from joblib import Parallel, delayed
@@ -31,7 +32,6 @@ def erdos_renyi(G):
 
 def sampling(G, cpa, sfunc, null_model):
     Gr = null_model(G)
-    # Gr.remove_edges_from(nx.selfloop_edges(Gr))
     Ar = sparse.csr_matrix(nx.adjacency_matrix(Gr))
     cpa.detect(Ar)
     q_rand = cpa.qs_
@@ -47,10 +47,10 @@ def qstest(
     significance_level=0.05,
     null_model=config_model,
     sfunc=sz_n,
-    num_of_thread=4,
-    num_of_rand_net=300,
+    num_of_rand_net=100,
     q_tilde=[],
     s_tilde=[],
+    **params
 ):
     """(q,s)-test for core-periphery structure.
 
@@ -89,6 +89,10 @@ def qstest(
         >>> coreness = km.get_coreness()
         >>> sig_pair_id, sig_coreness, significance, p_values = cpnet.qstest(pair_id, coreness, G, km)
     """
+
+    if "num_of_thread" in params:
+        warnings.warn("'num_of_thread keyword' is duplicated due to a compatibility issue with numba. Only one CPU will be used.")
+
     A = nx.adjacency_matrix(G)
     nodelabels = G.nodes()
     pair_id_a = np.array([pair_id[x] for x in nodelabels])
@@ -100,10 +104,9 @@ def qstest(
     alpha_corrected = 1.0 - (1.0 - significance_level) ** (1.0 / float(C))
 
     if len(q_tilde) == 0:
-        results = Parallel(n_jobs=num_of_thread)(
-            delayed(sampling)(G, cpa, sfunc, null_model)
-            for i in tqdm(range(num_of_rand_net))
-        )
+        results = []
+        for _ in tqdm(range(num_of_rand_net)):
+            results+=[sampling(G, cpa, sfunc, null_model)]
         if isinstance(results[0]["q"], list):
             q_tilde = np.array(sum([res["q"] for res in results], []))
         else:
@@ -132,7 +135,6 @@ def qstest(
         if (s_std <= 1e-30) or (q_std <= 1e-30):
             continue
         logw = -(((s[cid] - s_tilde) / (np.sqrt(2.0) * h * s_std)) ** 2)
-        # w = np.exp(-((s[cid] - s_tilde) / (np.sqrt(2.0) * h * s_std)) ** 2)
         cd = norm.cdf(
             (
                 (q[cid] - q_tilde) / (h * q_std)

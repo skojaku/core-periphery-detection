@@ -16,7 +16,7 @@ All algorithms are implemented in Python, with speed accelerations by numba, and
 
 # Installation
 
-Before installing this package, make sure that you have a **Python with version 3.6 or above**.
+Before installing this package, make sure that you have a **Python with version 3.6, 3.7, 3.8, and 3.9 
 
 `pip` is the most easiest way to install:
 

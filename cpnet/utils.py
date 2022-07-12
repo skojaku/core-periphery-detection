@@ -1,3 +1,4 @@
+# %%
 from collections import Counter, defaultdict
 
 import matplotlib as mpl
@@ -7,9 +8,7 @@ import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 import seaborn as sns
-from fa2 import ForceAtlas2
 from scipy import sparse
-
 
 def to_adjacency_matrix(net):
     if sparse.issparse(net):
@@ -99,30 +98,11 @@ def classify_nodes(G, c, x, max_num=None):
     return colored_nodes, muted, residuals
 
 
-def calc_node_pos(G, iterations=300, **params):
-    default_params = dict(
-        # Behavior alternatives
-        outboundAttractionDistribution=False,  # Dissuade hubs
-        linLogMode=False,  # NOT IMPLEMENTED
-        adjustSizes=False,  # Prevent overlap (NOT IMPLEMENTED)
-        edgeWeightInfluence=1.0,
-        # Performance
-        jitterTolerance=1.0,  # Tolerance
-        barnesHutOptimize=True,
-        barnesHutTheta=1.2,
-        multiThreaded=False,  # NOT IMPLEMENTED
-        # Tuning
-        scalingRatio=2.0,
-        strongGravityMode=False,
-        gravity=1.0,
-        verbose=False,
-    )
-    if params is not None:
-        for k, v in params.items():
-            default_params[k] = v
-    forceatlas2 = ForceAtlas2(**default_params)
-    return forceatlas2.forceatlas2_networkx_layout(G, pos=None, iterations=iterations)
-
+def calc_node_pos(G, layout_algorithm):
+    if layout_algorithm is None:
+        return nx.spring_layout(G)
+    else:
+        return layout_algorithm(G)
 
 def draw(
     G,
@@ -137,7 +117,7 @@ def draw(
     draw_nodes_kwd={},
     draw_edges_kwd={"edge_color": "#adadad"},
     draw_labels_kwd={},
-    layout_kwd={},
+    layout_algorithm=None,
 ):
     """Plot the core-periphery structure in the networks.
 
@@ -178,7 +158,7 @@ def draw(
 
     # Set the position of nodes
     if pos is None:
-        pos = calc_node_pos(G, **layout_kwd)
+        pos = calc_node_pos(G, layout_algorithm)
 
     # Draw
     nodes = nx.draw_networkx_nodes(

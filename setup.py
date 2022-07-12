@@ -2,7 +2,7 @@ import os
 
 from setuptools import find_packages, setup
 
-__version__ = "0.0.20"
+__version__ = "0.0.21"
 
 
 def load_requires_from_file(fname):
